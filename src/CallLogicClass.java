@@ -9,6 +9,7 @@ public class CallLogicClass {
     private int nextLevel = 1;
     private int maxLevel = 4;
     private int minLevel = 1;
+    private int difference = 0;
 
     private boolean[] stops;
     private CentralLogicClass.Req_Dir[] Req_Dir_Array;
@@ -78,7 +79,8 @@ public class CallLogicClass {
         return currentLevel;
     }
 
-    public void setCurrentLevel(int currentLevel) {
-        this.currentLevel = currentLevel;
+    public int getdiffernce()
+    {
+        return difference;
     }
 }

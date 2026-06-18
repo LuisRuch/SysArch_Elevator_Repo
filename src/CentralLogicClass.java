@@ -50,6 +50,8 @@ public class CentralLogicClass {
     private boolean[] stops = new boolean[5];                        //stops[1] = level 1, stops[2] = level 2, stops[3] = level 3, stops[4] = level 4
     public enum Req_Dir {Up, Down , DontCare};                      //Requested direction
     private Req_Dir[] Req_Dir_Array = new Req_Dir[5];
+    public enum Mode {OnCall, IDLE}
+    private Mode mode = Mode.IDLE;
 
     private boolean runningModbus = false;
     private boolean runningRest = false;
@@ -101,6 +103,7 @@ public class CentralLogicClass {
             while (runningRest) {
                 try {
                     opcuaInput.handleInputs();
+                    calcfunctions();
                     elevatorSA.handleStateTransitions();
                     Thread.sleep(200);
                 } catch (Exception e) {
@@ -111,6 +114,34 @@ public class CentralLogicClass {
         //pollingModbusThread.setDaemon(true); // Thread stops if main stops
         pollingRestThread.start();
     }
+
+
+    //special Information
+    public void calcfunctions()
+    {
+        if(!hasAnyStop())
+        {
+            mode = Mode.IDLE;
+        }
+
+        if(elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED_CLOSED_DOOR ||  elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED_OPEN_DOOR)
+        {
+            mode = Mode.OnCall;
+        }
+
+        //des kann noch in CallLogic gebaut werden
+        difference = callLogic.getnextLevel() - callLogicurrentLevel;
+    }
+
+    public boolean hasAnyStop() {
+        for (boolean stop : stops) {
+            if (stop) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
     //Getter und Setter
@@ -155,4 +186,7 @@ public class CentralLogicClass {
         this.specialInputs = specialInputs;
     }
 
+    public Mode getMode() {
+        return mode;
+    }
 }

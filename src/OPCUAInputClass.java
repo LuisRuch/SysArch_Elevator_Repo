@@ -102,7 +102,7 @@ public class OPCUAInputClass {
 
 
     //Getter und Setter
-    public boolean isInsideLevel1() {
+    public boolean getInsideLevel1() {
         return insideLevel1;
     }
 
@@ -110,7 +110,7 @@ public class OPCUAInputClass {
         this.insideLevel1 = insideLevel1;
     }
 
-    public boolean isInsideLevel2() {
+    public boolean getInsideLevel2() {
         return insideLevel2;
     }
 
@@ -118,7 +118,7 @@ public class OPCUAInputClass {
         this.insideLevel2 = insideLevel2;
     }
 
-    public boolean isInsideLevel3() {
+    public boolean getInsideLevel3() {
         return insideLevel3;
     }
 
@@ -126,7 +126,7 @@ public class OPCUAInputClass {
         this.insideLevel3 = insideLevel3;
     }
 
-    public boolean isInsideLevel4() {
+    public boolean getInsideLevel4() {
         return insideLevel4;
     }
 
@@ -134,7 +134,7 @@ public class OPCUAInputClass {
         this.insideLevel4 = insideLevel4;
     }
 
-    public boolean isOutsideLevel1Up() {
+    public boolean getOutsideLevel1Up() {
         return outsideLevel1Up;
     }
 
@@ -142,7 +142,7 @@ public class OPCUAInputClass {
         this.outsideLevel1Up = outsideLevel1Up;
     }
 
-    public boolean isOutsideLevel2Up() {
+    public boolean getOutsideLevel2Up() {
         return outsideLevel2Up;
     }
 
@@ -150,7 +150,7 @@ public class OPCUAInputClass {
         this.outsideLevel2Up = outsideLevel2Up;
     }
 
-    public boolean isOutsideLevel2Down() {
+    public boolean getOutsideLevel2Down() {
         return outsideLevel2Down;
     }
 
@@ -158,7 +158,7 @@ public class OPCUAInputClass {
         this.outsideLevel2Down = outsideLevel2Down;
     }
 
-    public boolean isOutsideLevel3Up() {
+    public boolean getOutsideLevel3Up() {
         return outsideLevel3Up;
     }
 
@@ -166,7 +166,7 @@ public class OPCUAInputClass {
         this.outsideLevel3Up = outsideLevel3Up;
     }
 
-    public boolean isOutsideLevel3Down() {
+    public boolean getOutsideLevel3Down() {
         return outsideLevel3Down;
     }
 
@@ -174,7 +174,7 @@ public class OPCUAInputClass {
         this.outsideLevel3Down = outsideLevel3Down;
     }
 
-    public boolean isOutsideLevel4Down() {
+    public boolean getOutsideLevel4Down() {
         return outsideLevel4Down;
     }
 
@@ -182,7 +182,7 @@ public class OPCUAInputClass {
         this.outsideLevel4Down = outsideLevel4Down;
     }
 
-    public boolean isOpenDoor() {
+    public boolean getOpenDoor() {
         return OpenDoor;
     }
 
@@ -190,7 +190,7 @@ public class OPCUAInputClass {
         OpenDoor = openDoor;
     }
 
-    public boolean isCloseDoor() {
+    public boolean getCloseDoor() {
         return CloseDoor;
     }
 
@@ -198,7 +198,7 @@ public class OPCUAInputClass {
         CloseDoor = closeDoor;
     }
 
-    public boolean isEmergencyStop() {
+    public boolean getEmergencyStop() {
         return emergencyStop;
     }
 

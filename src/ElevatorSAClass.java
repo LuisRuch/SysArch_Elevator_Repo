@@ -33,16 +33,22 @@ public class ElevatorSAClass {
         switch (currentState) {
 
             case STOPPED_CLOSED_DOOR -> {
-                if (shouldOpenDoor()) {
+                if (d1()) {
                     changeState(State.STOPPED_OPEN_DOOR);
                 }
-                else if (canStartV1Up()) {
+                else if (u11()) {
                     changeState(State.V1_UP);
                 }
-                else if (canStartV1Down()) {
+                else if (u12()) {
+                    changeState(State.V2_UP);
+                }
+                else if (d11()) {
                     changeState(State.V1_DOWN);
                 }
-                else if (canReturnToCrawlAfterEmergency()) {
+                else if (d12()) {
+                    changeState(State.V2_DOWN);
+                }
+                else if (c1()) {
                     changeState(State.CRAWL);
                 }
             }
@@ -161,37 +167,73 @@ public class ElevatorSAClass {
 
 
 
-    // ------------------------------------------------------------
-    // Conditions from STOPPED_CLOSED_DOOR
-    // ------------------------------------------------------------
 
-    private boolean shouldOpenDoor() {
-        // Open door when:
-        // - no emergency stop and last state was CRAWL
-        // OR
-        // - no calls and door open signal is active
-        return false;
+    //Conditions from STOPPED_CLOSED_DOOR
+    private boolean d1() {
+        //Automatic open door, if elevator arrived at destination - no Emergency Stop  && last State was crawl
+        //or
+        //open door if no call and button clicked to open door
+        //or
+        //if had no calls(IDLE) and (new)request in same level as current elevator
+
+        if((!opcuaInput.getEmergencyStop() && lastState == State.CRAWL) || (!centralLogic.getStops()[0] && opcuaInput.getOpenDoor()) || centralLogic.getMode() == CentralLogicClass.Mode.IDLE)
+            return true;
+
+        else
+            return false;
     }
 
-    private boolean canStartV1Up() {
-        // Start moving up with V1 when:
-        // - position difference exists
-        // - no emergency stop is active
-        return false;
+    private boolean u11() {
+        //after emergncy stop if he was already in final approach - last stop had to be open door is there was no emergency
+        //last state not open door and no emergency stop
+
+        if(lastState == State.V1_UP && !opcuaInput.getEmergencyStop())
+            return true;
+
+        else
+            return false;
     }
 
-    private boolean canStartV1Down() {
-        // Start moving down with V1 when:
-        // - position difference exists
-        // - no emergency stop is active
-        return false;
+    private boolean u12() {
+        //last state not open door and no emergency stop
+        //or
+        //differnce pos and no ES
+
+
+        if((lastState == State.V2_UP && !opcuaInput.getEmergencyStop()) || (callLogic.getdiffernce() > 0 && !opcuaInput.getEmergencyStop()))
+            return true;
+
+        else
+            return false;
+
     }
 
-    private boolean canReturnToCrawlAfterEmergency() {
-        // Enter crawl when:
-        // - there was an emergency
-        // - previous state was CRAWL
-        return false;
+    private boolean d11() {
+
+        if(lastState == State.V1_DOWN && !opcuaInput.getEmergencyStop())
+            return true;
+
+        else
+            return false;
+    }
+
+    private boolean d12() {
+
+        if((lastState == State.V2_DOWN && !opcuaInput.getEmergencyStop()) || (callLogic.getdiffernce() < 0 && !opcuaInput.getEmergencyStop()))
+            return true;
+
+        else
+            return false;
+
+    }
+
+    private boolean c1() {
+
+        if(lastState == State.CRAWL && !opcuaInput.getEmergencyStop())
+            return true;
+
+        else
+            return false;
     }
 
     // ------------------------------------------------------------
