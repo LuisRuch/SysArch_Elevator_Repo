@@ -3,7 +3,19 @@ public class ElevatorSAClass {
     private State currentState = State.STOPPED_CLOSED_DOOR;
     private State lastState = State.STOPPED_CLOSED_DOOR;
 
-    public ElevatorSAClass() {}
+
+    CentralLogicClass centralLogic;
+    OPCUAInputClass opcuaInput;
+    ModbusClass modbus;
+    CallLogicClass callLogic;
+
+    public ElevatorSAClass(CentralLogicClass centralLogic, OPCUAInputClass opcuaInput, ModbusClass modbus, CallLogicClass callLogic)
+    {
+        this.callLogic = callLogic;
+        this.centralLogic = centralLogic;
+        this.opcuaInput = opcuaInput;
+        this.modbus = modbus;
+    }
 
     public enum State {
         STOPPED_CLOSED_DOOR,
@@ -15,12 +27,12 @@ public class ElevatorSAClass {
         CRAWL
     }
 
-    public void handleStateTransitions() {
+    public void handleStateTransitions()throws Exception
+    {
 
         switch (currentState) {
 
             case STOPPED_CLOSED_DOOR -> {
-                //Modbus befehl  hier einfügen
                 if (shouldOpenDoor()) {
                     changeState(State.STOPPED_OPEN_DOOR);
                 }
@@ -36,14 +48,12 @@ public class ElevatorSAClass {
             }
 
             case STOPPED_OPEN_DOOR -> {
-                //Modbus befehl  hier einfügen
                 if (shouldCloseDoor()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
                 }
             }
 
             case V1_UP -> {
-                //Modbus befehl  hier einfügen
                 if (isEmergencyStopActive()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
                 }
@@ -56,7 +66,6 @@ public class ElevatorSAClass {
             }
 
             case V2_UP -> {
-                //Modbus befehl  hier einfügen
                 if (isEmergencyStopActive()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
                 }
@@ -66,7 +75,6 @@ public class ElevatorSAClass {
             }
 
             case V1_DOWN -> {
-                //Modbus befehl  hier einfügen
                 if (isEmergencyStopActive()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
                 }
@@ -79,7 +87,6 @@ public class ElevatorSAClass {
             }
 
             case V2_DOWN -> {
-                //Modbus befehl  hier einfügen
                 if (isEmergencyStopActive()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
                 }
@@ -99,7 +106,8 @@ public class ElevatorSAClass {
 
 
 
-    private void changeState(State newState) {
+    private void changeState(State newState) throws Exception
+    {
 
         if (currentState == newState) {
             return;
@@ -108,17 +116,46 @@ public class ElevatorSAClass {
         lastState = currentState;
         currentState = newState;
 
-        // kann mann auch fpr die anderen machen dann wird nur einemal gesetzt und nicht immer wieder neu -> weniger communication über Modbus
-        if(newState == State.CRAWL)
-        {
-            gehtDoch();
+        //on entry of state the follwoing actions will be caried out
+        switch (newState) {
+            case STOPPED_CLOSED_DOOR:
+                modbus.stopMotor();
+                modbus.stopDoor();
+                break;
+
+            case STOPPED_OPEN_DOOR:
+                modbus.stopDoor();
+                break;
+
+            case V1_UP:
+                modbus.startMotorUpV1();
+                break;
+
+            case V2_UP:
+                modbus.startMotorUpV2();
+                break;
+
+            case V1_DOWN:
+                modbus.startMotorDownV1();
+                break;
+
+            case V2_DOWN:
+                modbus.startMotorDownV2();
+                break;
+
+            case CRAWL:
+
+                crawlapproach();
+                break;
         }
+
+
     }
 
 
 
 
-    private void gehtDoch() {
+    private void crawlapproach() {
         //hier einmal thread aufrufen. der sich annährt
     }
 

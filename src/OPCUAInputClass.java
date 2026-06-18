@@ -30,16 +30,14 @@ public class OPCUAInputClass {
 
     private boolean[] stops = new boolean[5];                                            //stops[1] = level 1, stops[2] = level 2, stops[3] = level 3, stops[4] = level 4
     private CentralLogicClass.Req_Dir[] Req_Dir_Array = new CentralLogicClass.Req_Dir[3];                //[2] = level 2, [3] = level 3
-    private CentralLogicClass central;
 
 
 
     //Constructor
-    public OPCUAInputClass(boolean[] stops, CentralLogicClass.Req_Dir[] Req_Dir_Array, CentralLogicClass logic ) {
+    public OPCUAInputClass(boolean[] stops, CentralLogicClass.Req_Dir[] Req_Dir_Array) {
 
         this.stops = stops;
         this.Req_Dir_Array = Req_Dir_Array;
-        this.central = logic;
     }
 
 
@@ -103,76 +101,109 @@ public class OPCUAInputClass {
     }
 
 
-    public void setDoorOpen(boolean value) {
-        OpenDoor = value;
+    //Getter und Setter
+    public boolean isInsideLevel1() {
+        return insideLevel1;
     }
 
-    public boolean getDoorOpen() {
+    public void setInsideLevel1(boolean insideLevel1) {
+        this.insideLevel1 = insideLevel1;
+    }
+
+    public boolean isInsideLevel2() {
+        return insideLevel2;
+    }
+
+    public void setInsideLevel2(boolean insideLevel2) {
+        this.insideLevel2 = insideLevel2;
+    }
+
+    public boolean isInsideLevel3() {
+        return insideLevel3;
+    }
+
+    public void setInsideLevel3(boolean insideLevel3) {
+        this.insideLevel3 = insideLevel3;
+    }
+
+    public boolean isInsideLevel4() {
+        return insideLevel4;
+    }
+
+    public void setInsideLevel4(boolean insideLevel4) {
+        this.insideLevel4 = insideLevel4;
+    }
+
+    public boolean isOutsideLevel1Up() {
+        return outsideLevel1Up;
+    }
+
+    public void setOutsideLevel1Up(boolean outsideLevel1Up) {
+        this.outsideLevel1Up = outsideLevel1Up;
+    }
+
+    public boolean isOutsideLevel2Up() {
+        return outsideLevel2Up;
+    }
+
+    public void setOutsideLevel2Up(boolean outsideLevel2Up) {
+        this.outsideLevel2Up = outsideLevel2Up;
+    }
+
+    public boolean isOutsideLevel2Down() {
+        return outsideLevel2Down;
+    }
+
+    public void setOutsideLevel2Down(boolean outsideLevel2Down) {
+        this.outsideLevel2Down = outsideLevel2Down;
+    }
+
+    public boolean isOutsideLevel3Up() {
+        return outsideLevel3Up;
+    }
+
+    public void setOutsideLevel3Up(boolean outsideLevel3Up) {
+        this.outsideLevel3Up = outsideLevel3Up;
+    }
+
+    public boolean isOutsideLevel3Down() {
+        return outsideLevel3Down;
+    }
+
+    public void setOutsideLevel3Down(boolean outsideLevel3Down) {
+        this.outsideLevel3Down = outsideLevel3Down;
+    }
+
+    public boolean isOutsideLevel4Down() {
+        return outsideLevel4Down;
+    }
+
+    public void setOutsideLevel4Down(boolean outsideLevel4Down) {
+        this.outsideLevel4Down = outsideLevel4Down;
+    }
+
+    public boolean isOpenDoor() {
         return OpenDoor;
     }
 
-    public void setDoorClose(boolean value) {
-        CloseDoor = value;
+    public void setOpenDoor(boolean openDoor) {
+        OpenDoor = openDoor;
     }
 
-    public boolean getDoorClose() {
+    public boolean isCloseDoor() {
         return CloseDoor;
     }
 
-    public void setEmergencyStop(boolean value) {
-        emergencyStop = value;
+    public void setCloseDoor(boolean closeDoor) {
+        CloseDoor = closeDoor;
     }
 
-    public boolean getEmergencyStop() {
+    public boolean isEmergencyStop() {
         return emergencyStop;
     }
 
-    public void setReset(boolean value) {
-        reset = value;
-    }
-
-    public boolean getReset() {
-        return reset;
-    }
-
-    public void setSpeedV1Up(boolean value) {
-        speedV1Up = value;
-    }
-
-    public boolean getSpeedV1Up() {
-        return speedV1Up;
-    }
-
-    public void setSpeedV1Down(boolean value) {
-        speedV1Down = value;
-    }
-
-    public boolean getSpeedV1Down() {
-        return speedV1Down;
-    }
-
-    public void setSpeedV2Up(boolean value) {
-        speedV2Up = value;
-    }
-
-    public boolean getSpeedV2Up() {
-        return speedV2Up;
-    }
-
-    public void setSpeedV2Down(boolean value) {
-        speedV2Down = value;
-    }
-
-    public boolean getSpeedV2Down() {
-        return speedV2Down;
-    }
-
-    public void setSpecialCrawl(int value) {
-        specialCrawl = value;
-    }
-
-    public int getSpecialCrawl() {
-        return specialCrawl;
+    public void setEmergencyStop(boolean emergencyStop) {
+        this.emergencyStop = emergencyStop;
     }
 
 }

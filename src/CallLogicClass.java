@@ -6,17 +6,16 @@ public class CallLogicClass {
 
     private CentralLogicClass.Req_Dir DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
     private int currentLevel = 0;
-    private int nextLevel;
+    private int nextLevel = 1;
     private int maxLevel = 4;
     private int minLevel = 1;
 
     private boolean[] stops;
     private CentralLogicClass.Req_Dir[] Req_Dir_Array;
 
-    public CallLogicClass(boolean[] stops, CentralLogicClass.Req_Dir[] Req_Dir_Array, int currentLevel, CentralLogicClass logic) {
+    public CallLogicClass(boolean[] stops, CentralLogicClass.Req_Dir[] Req_Dir_Array, CentralLogicClass logic) {
         this.stops = stops;
         this.Req_Dir_Array = Req_Dir_Array;
-        this.currentLevel = currentLevel;
     }
 
     public int ChangeNextLevel() {

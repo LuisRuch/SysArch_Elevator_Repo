@@ -207,5 +207,7 @@ public class ModbusClass {
         client.WriteSingleCoil(Output_motor_up_V1, false);
         client.WriteSingleCoil(Output_motor_up_V2, false);
         client.WriteSingleRegister(Output_Crawl, 0);
+        client.WriteSingleCoil(Output_Open_Door, false);
+        client.WriteSingleCoil(Output_Close_Door, false);
     }
 }

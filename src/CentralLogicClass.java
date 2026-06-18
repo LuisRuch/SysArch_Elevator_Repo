@@ -68,8 +68,9 @@ public class CentralLogicClass {
     {
         this.modbus = modbus;
 
-        callLogic = new CallLogicClass(stops,Req_Dir_Array, ,this);
-        opcuaInput = new OPCUAInputClass(stops,Req_Dir_Array, this);
+        callLogic = new CallLogicClass(stops,Req_Dir_Array,this);
+        opcuaInput = new OPCUAInputClass(stops,Req_Dir_Array);
+        elevatorSA = new ElevatorSAClass(this,opcuaInput,modbus,callLogic);
 
     }
     //start Modbus
@@ -111,5 +112,47 @@ public class CentralLogicClass {
         pollingRestThread.start();
     }
 
+
+    //Getter und Setter
+
+    public boolean[] getStops() {
+        return stops;
+    }
+
+    public void setStops(boolean[] stops) {
+        this.stops = stops;
+    }
+
+    public Req_Dir[] getReq_Dir_Array() {
+        return Req_Dir_Array;
+    }
+
+    public void setReq_Dir_Array(Req_Dir[] req_Dir_Array) {
+        this.Req_Dir_Array = req_Dir_Array;
+    }
+
+    public boolean[] getLevelInputs() {
+        return levelInputs;
+    }
+
+    public void setLevelInputs(boolean[] levelInputs) {
+        this.levelInputs = levelInputs;
+    }
+
+    public boolean[] getStatusInputs() {
+        return statusInputs;
+    }
+
+    public void setStatusInputs(boolean[] statusInputs) {
+        this.statusInputs = statusInputs;
+    }
+
+    public long[] getSpecialInputs() {
+        return specialInputs;
+    }
+
+    public void setSpecialInputs(long[] specialInputs) {
+        this.specialInputs = specialInputs;
+    }
 
 }
