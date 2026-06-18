@@ -1,8 +1,15 @@
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+
 public class ElevatorSAClass {
 
     private State currentState = State.STOPPED_CLOSED_DOOR;
     private State lastState = State.STOPPED_CLOSED_DOOR;
 
+    private ScheduledExecutorService schedulerDoor;
+    private volatile int timerDoorLevel = 0;
 
     CentralLogicClass centralLogic;
     OPCUAInputClass opcuaInput;
@@ -54,7 +61,7 @@ public class ElevatorSAClass {
             }
 
             case STOPPED_OPEN_DOOR -> {
-                if (shouldCloseDoor()) {
+                if (d2()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
                 }
             }
@@ -131,6 +138,7 @@ public class ElevatorSAClass {
 
             case STOPPED_OPEN_DOOR:
                 modbus.stopDoor();
+                startDoorTimer();
                 break;
 
             case V1_UP:
@@ -236,17 +244,25 @@ public class ElevatorSAClass {
             return false;
     }
 
-    // ------------------------------------------------------------
-    // Conditions from STOPPED_OPEN_DOOR
-    // ------------------------------------------------------------
 
-    private boolean shouldCloseDoor() {
+    //Conditions from STOPPED_OPEN_DOOR
+    private boolean d2() {
         // Close door when:
-        // - call exists and 6 seconds waited
+        // - call exists and 6 seconds waited and no ES
         // OR
-        // - no call exists and 12 seconds waited
-        return false;
+        //no calls after 6 sec and doorclose
+        //OR
+        // - no call exists and 12 seconds waited an no ES
+
+        if ((getDoorTimerLevel() >= 6000 && centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 600 && opcuaInput.getCloseDoor() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 1200 && centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()))
+        {
+            stopDoorTimer();
+            return true;
+        }
+        else
+            return false;
     }
+
 
     // ------------------------------------------------------------
     // Conditions from V1_UP / V1_DOWN
@@ -278,25 +294,29 @@ public class ElevatorSAClass {
         return false;
     }
 
-    // ------------------------------------------------------------
-    // General conditions
-    // ------------------------------------------------------------
 
-    private boolean isEmergencyStopActive() {
-        return false;
+    //spezial funktions
+    public void startDoorTimer() {
+        schedulerDoor = Executors.newSingleThreadScheduledExecutor();
+
+        schedulerDoor.scheduleAtFixedRate(() -> {
+            timerDoorLevel++;
+        }, 0, 1, TimeUnit.SECONDS);
     }
 
-    private boolean hasReachedSensor() {
-        return false;
+    public int getDoorTimerLevel() {
+        return timerDoorLevel;
     }
 
+    public void stopDoorTimer() {
+        if (schedulerDoor != null) {
+            schedulerDoor.shutdown();
+        }
+    }
 
-
+    //getter
     public State getCurrentState() {
         return currentState;
     }
 
-    public State getLastState() {
-        return lastState;
-    }
 }
