@@ -60,7 +60,7 @@ public class ModbusClass {
     private boolean[] statusInputs;      // IX10.0 bis IX10.4
     private long[] specialInputs;        // [0] cycles, [1] aufzugID, [2] speed
 
-    private boolean[] reachedSensors = new boolean[5];
+    private int lastLowerApproachSensorLevel = 0;
 
     // Modbus config
     public ModbusClass() throws UnknownHostException, IOException {
@@ -124,13 +124,26 @@ public class ModbusClass {
         return specialInputs;
     }
 
-    public boolean[] getReachsensors() {
-        reachedSensors[1] = client.ReadDiscreteInputs(Input_l1r, 1);
-        reachedSensors[2] = client.ReadDiscreteInputs(Input_l2r, 1);
-        reachedSensors[3] = client.ReadDiscreteInputs(Input_l3r, 1);
-        reachedSensors[4] = client.ReadDiscreteInputs(Input_l4r, 1);
-        return reachedSensors;
+    //vielleich in central
+    //des gleich noch für down
+    public void updateLastLowerApproachSensorFromLevelInputs() {
+        if (levelInputs == null) {
+            return;
+        }
+
+        if (levelInputs[Input_l2al - Input_l1sl]) {
+            lastLowerApproachSensorLevel = 2;
+        } else if (levelInputs[Input_l3al - Input_l1sl]) {
+            lastLowerApproachSensorLevel = 3;
+        } else if (levelInputs[Input_l4al - Input_l1sl]) {
+            lastLowerApproachSensorLevel = 4;
+        }
     }
+
+    public int getLastLowerApproachSensorLevel() {
+        return lastLowerApproachSensorLevel;
+    }
+
 
 
     // Output methods

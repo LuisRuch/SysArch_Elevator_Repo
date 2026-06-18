@@ -59,7 +59,6 @@ public class CentralLogicClass {
     private boolean[] levelInputs;       // IX0.1 bis IX3.3
     private boolean[] statusInputs;      // IX10.0 bis IX10.4
     private long[] specialInputs;        // [0] cycles, [1] aufzugID, [2] speed
-    private boolean[] reachedSensors;
 
     ModbusClass modbus;
 
@@ -87,7 +86,7 @@ public class CentralLogicClass {
                     levelInputs = modbus.getLevelInputs();
                     statusInputs = modbus.getStatusInputs();
                     specialInputs = modbus.getSpecialInputs();
-                    reachedSensors = modbus.getReachsensors();
+                    modbus.updateLastLowerApproachSensorFromLevelInputs();
                     Thread.sleep(200);
                 } catch (Exception e) {
                     System.err.println("Modbus reading error: " + e.getMessage());
@@ -175,10 +174,6 @@ public class CentralLogicClass {
 
     public long[] getSpecialInputs() {
         return specialInputs;
-    }
-
-    public boolean getReachedSensors(int level) {
-        return reachedSensors[level];
     }
 
     public Mode getMode() {

@@ -19,6 +19,7 @@ public class CallLogicClass {
         this.Req_Dir_Array = Req_Dir_Array;
     }
 
+    //hier noch restrection, dass wenn in zustand v1 dass dannn nicht mehr ge#ndert werden kann
     public int ChangeNextLevel() {
 
         if (DirOfTrv == CentralLogicClass.Req_Dir.Up) {
