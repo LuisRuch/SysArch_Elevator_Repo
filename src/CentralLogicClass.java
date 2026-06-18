@@ -49,7 +49,7 @@ public class CentralLogicClass {
     //Variables for elevator levels - passed to HMI-Class
     private boolean[] stops = new boolean[5];                        //stops[1] = level 1, stops[2] = level 2, stops[3] = level 3, stops[4] = level 4
     public enum Req_Dir {Up, Down , DontCare};                      //Requested direction
-    private LogicClass.Req_Dir[] Req_Dir_Array = new LogicClass.Req_Dir[5];
+    private Req_Dir[] Req_Dir_Array = new Req_Dir[5];
 
     private boolean runningModbus = false;
     private boolean runningRest = false;
@@ -60,15 +60,15 @@ public class CentralLogicClass {
 
     ModbusClass modbus;
 
-    CallLogic callLogic;
-    OPCUAInputClass opcuaInput
+    CallLogicClass callLogic;
+    OPCUAInputClass opcuaInput;
     ElevatorSAClass elevatorSA;
 
-    public LogicClass(ModbusClass modbus)
+    public CentralLogicClass(ModbusClass modbus)
     {
         this.modbus = modbus;
 
-        callLogic = new CallLogic(stops,Req_Dir_Array, ,this);
+        callLogic = new CallLogicClass(stops,Req_Dir_Array, ,this);
         opcuaInput = new OPCUAInputClass(stops,Req_Dir_Array, this);
 
     }
@@ -99,8 +99,8 @@ public class CentralLogicClass {
         Thread pollingRestThread = new Thread(() -> {
             while (runningRest) {
                 try {
-                    OPCUAInputClass.handleInputs();
-                    ElevatorSAClass.handleStateTransitions();
+                    opcuaInput.handleInputs();
+                    elevatorSA.handleStateTransitions();
                     Thread.sleep(200);
                 } catch (Exception e) {
                     System.err.println("Rest reading error: " + e.getMessage());

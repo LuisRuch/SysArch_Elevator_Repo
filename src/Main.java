@@ -1,5 +1,8 @@
+import java.io.IOException;
+
 public class Main {
-    public static void main(String[] args)
+
+    public static void main(String[] args) throws Exception
     {
         //creates ModbusClass + start Modbus
         ModbusClass modbus = new ModbusClass();
@@ -9,7 +12,7 @@ public class Main {
 
 
         //creates CentralLogic Class + passes references
-        LogicClass central = new LogicClass(modbus);
+        CentralLogicClass central = new CentralLogicClass(modbus);
             central.startPollingModbus();
             central.startPollingRest();
     }

@@ -4,16 +4,16 @@ public class CallLogicClass {
     // This class will set the nextLevel - therefore the elevator will know where to go
     // this information will be given to the class Motor_Logic
 
-    private CentralLogic.Req_Dir DirOfTrv = CentralLogic.Req_Dir.DontCare;
+    private CentralLogicClass.Req_Dir DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
     private int currentLevel = 0;
     private int nextLevel;
     private int maxLevel = 4;
     private int minLevel = 1;
 
     private boolean[] stops;
-    private CentralLogic.Req_Dir[] Req_Dir_Array;
+    private CentralLogicClass.Req_Dir[] Req_Dir_Array;
 
-    public CallLogicClass(boolean[] stops, CentralLogic.Req_Dir[] Req_Dir_Array, int currentLevel, CentralLogic logic) {
+    public CallLogicClass(boolean[] stops, CentralLogicClass.Req_Dir[] Req_Dir_Array, int currentLevel, CentralLogicClass logic) {
         this.stops = stops;
         this.Req_Dir_Array = Req_Dir_Array;
         this.currentLevel = currentLevel;
@@ -21,7 +21,7 @@ public class CallLogicClass {
 
     public int ChangeNextLevel() {
 
-        if (DirOfTrv == CentralLogic.Req_Dir.Up) {
+        if (DirOfTrv == CentralLogicClass.Req_Dir.Up) {
             for (int i = currentLevel; i <= maxLevel; i++) {
 
                 if (stops[i]) {
@@ -39,7 +39,7 @@ public class CallLogicClass {
             }
         }
 
-        else if (DirOfTrv == CentralLogic.Req_Dir.Down) {
+        else if (DirOfTrv == CentralLogicClass.Req_Dir.Down) {
             for (int i = currentLevel; i >= minLevel; i--) {
 
                 if (stops[i]) {
@@ -64,11 +64,11 @@ public class CallLogicClass {
                     nextLevel = i;
 
                     if (i > currentLevel) {
-                        DirOfTrv = CentralLogic.Req_Dir.Up;
+                        DirOfTrv = CentralLogicClass.Req_Dir.Up;
                     } else if (i < currentLevel) {
-                        DirOfTrv = CentralLogic.Req_Dir.Down;
+                        DirOfTrv = CentralLogicClass.Req_Dir.Down;
                     } else {
-                        DirOfTrv = CentralLogic.Req_Dir.DontCare;
+                        DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
                     }
 
                     return i;

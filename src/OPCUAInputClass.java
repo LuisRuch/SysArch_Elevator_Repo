@@ -29,13 +29,13 @@ public class OPCUAInputClass {
 
 
     private boolean[] stops = new boolean[5];                                            //stops[1] = level 1, stops[2] = level 2, stops[3] = level 3, stops[4] = level 4
-    private CentralLogic.Req_Dir[] Req_Dir_Array = new CentralLogic.Req_Dir[3];                //[2] = level 2, [3] = level 3
-    private CentralLogic central;
+    private CentralLogicClass.Req_Dir[] Req_Dir_Array = new CentralLogicClass.Req_Dir[3];                //[2] = level 2, [3] = level 3
+    private CentralLogicClass central;
 
 
 
     //Constructor
-    public OPCUAInputClass(boolean[] stops, CentralLogic.Req_Dir[] Req_Dir_Array, CentralLogic logic ) {
+    public OPCUAInputClass(boolean[] stops, CentralLogicClass.Req_Dir[] Req_Dir_Array, CentralLogicClass logic ) {
 
         this.stops = stops;
         this.Req_Dir_Array = Req_Dir_Array;
@@ -67,37 +67,37 @@ public class OPCUAInputClass {
 
         if (outsideLevel1Up) {
             stops[1] = true;
-            Req_Dir_Array[1] = CentralLogic.Req_Dir.Up;
+            Req_Dir_Array[1] = CentralLogicClass.Req_Dir.Up;
             outsideLevel1Up = false;
         }
 
         if (outsideLevel2Up) {
             stops[2] = true;
-            Req_Dir_Array[2] = CentralLogic.Req_Dir.Up;
+            Req_Dir_Array[2] = CentralLogicClass.Req_Dir.Up;
             outsideLevel2Up = false;
         }
 
         if (outsideLevel2Down) {
             stops[2] = true;
-            Req_Dir_Array[2] = CentralLogic.Req_Dir.Down;
+            Req_Dir_Array[2] = CentralLogicClass.Req_Dir.Down;
             outsideLevel2Down = false;
         }
 
         if (outsideLevel3Up) {
             stops[3] = true;
-            Req_Dir_Array[3] = CentralLogic.Req_Dir.Up;
+            Req_Dir_Array[3] = CentralLogicClass.Req_Dir.Up;
             outsideLevel3Up = false;
         }
 
         if (outsideLevel3Down) {
             stops[3] = true;
-            Req_Dir_Array[3] = CentralLogic.Req_Dir.Down;
+            Req_Dir_Array[3] = CentralLogicClass.Req_Dir.Down;
             outsideLevel3Down = false;
         }
 
         if (outsideLevel4Down) {
             stops[4] = true;
-            Req_Dir_Array[4] = CentralLogic.Req_Dir.Down;
+            Req_Dir_Array[4] = CentralLogicClass.Req_Dir.Down;
             outsideLevel4Down = false;
         }
     }
