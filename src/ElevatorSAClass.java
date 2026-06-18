@@ -40,77 +40,71 @@ public class ElevatorSAClass {
         switch (currentState) {
 
             case STOPPED_CLOSED_DOOR -> {
-                if (d1()) {
+                if (door1()) {
                     changeState(State.STOPPED_OPEN_DOOR);
                 }
-                else if (u11()) {
+                else if (AESU()) {
                     changeState(State.V1_UP);
                 }
-                else if (u12()) {
+                else if (U1()) {
                     changeState(State.V2_UP);
                 }
-                else if (d11()) {
+                else if (AESD()) {
                     changeState(State.V1_DOWN);
                 }
-                else if (d12()) {
+                else if (D1()) {
                     changeState(State.V2_DOWN);
                 }
-                else if (c1()) {
+                else if (AESC()) {
                     changeState(State.CRAWL);
                 }
             }
 
             case STOPPED_OPEN_DOOR -> {
-                if (d2()) {
+                if (door2()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
-                }
-            }
-
-            case V1_UP -> {
-                if (isEmergencyStopActive()) {
-                    changeState(State.STOPPED_CLOSED_DOOR);
-                }
-                else if (canMoveFromV1ToV2()) {
-                    changeState(State.V2_UP);
-                }
-                else if (canEnterCrawlFromV1()) {
-                    changeState(State.CRAWL);
                 }
             }
 
             case V2_UP -> {
-                if (isEmergencyStopActive()) {
+                if (ES()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
                 }
-                else if (canMoveFromV2ToV1()) {
+                else if (U2()) {
                     changeState(State.V1_UP);
                 }
             }
 
-            case V1_DOWN -> {
-                if (isEmergencyStopActive()) {
+            case V1_UP -> {
+                if (ES()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
                 }
-                else if (canMoveFromV1ToV2()) {
-                    changeState(State.V2_DOWN);
-                }
-                else if (canEnterCrawlFromV1()) {
+                else if (U3()) {
                     changeState(State.CRAWL);
                 }
             }
 
             case V2_DOWN -> {
-                if (isEmergencyStopActive()) {
+                if (ES()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
                 }
-                else if (canMoveFromV2ToV1()) {
+                else if (D2()) {
                     changeState(State.V1_DOWN);
+                }
+            }
+
+            case V1_DOWN -> {
+                if (ES()) {
+                    changeState(State.STOPPED_CLOSED_DOOR);
+                }
+                else if (D3()) {
+                    changeState(State.CRAWL);
                 }
             }
 
             case CRAWL -> {
 
-                if (isEmergencyStopActive() || hasReachedSensor()) {
+                if (ES() || finish()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
                 }
             }
@@ -177,7 +171,7 @@ public class ElevatorSAClass {
 
 
     //Conditions from STOPPED_CLOSED_DOOR
-    private boolean d1() {
+    private boolean door1() {
         //Automatic open door, if elevator arrived at destination - no Emergency Stop  && last State was crawl
         //or
         //open door if no call and button clicked to open door
@@ -191,7 +185,7 @@ public class ElevatorSAClass {
             return false;
     }
 
-    private boolean u11() {
+    private boolean AESU() {
         //after emergncy stop if he was already in final approach - last stop had to be open door is there was no emergency
         //last state not open door and no emergency stop
 
@@ -202,7 +196,7 @@ public class ElevatorSAClass {
             return false;
     }
 
-    private boolean u12() {
+    private boolean U1() {
         //last state not open door and no emergency stop
         //or
         //differnce pos and no ES
@@ -216,7 +210,7 @@ public class ElevatorSAClass {
 
     }
 
-    private boolean d11() {
+    private boolean AESD() {
 
         if(lastState == State.V1_DOWN && !opcuaInput.getEmergencyStop())
             return true;
@@ -225,7 +219,7 @@ public class ElevatorSAClass {
             return false;
     }
 
-    private boolean d12() {
+    private boolean D1() {
 
         if((lastState == State.V2_DOWN && !opcuaInput.getEmergencyStop()) || (callLogic.getdiffernce() < 0 && !opcuaInput.getEmergencyStop()))
             return true;
@@ -235,7 +229,7 @@ public class ElevatorSAClass {
 
     }
 
-    private boolean c1() {
+    private boolean AESC() {
 
         if(lastState == State.CRAWL && !opcuaInput.getEmergencyStop())
             return true;
@@ -246,15 +240,15 @@ public class ElevatorSAClass {
 
 
     //Conditions from STOPPED_OPEN_DOOR
-    private boolean d2() {
+    private boolean door2() {
         // Close door when:
         // - call exists and 6 seconds waited and no ES
         // OR
         //no calls after 6 sec and doorclose
         //OR
-        // - no call exists and 12 seconds waited an no ES
+        // - no call exists and 12 seconds waited and no ES
 
-        if ((getDoorTimerLevel() >= 6000 && centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 600 && opcuaInput.getCloseDoor() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 1200 && centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()))
+        if ((getDoorTimerLevel() >= 6000 && centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 6000 && opcuaInput.getCloseDoor() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 12000 && centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()))
         {
             stopDoorTimer();
             return true;
@@ -263,36 +257,50 @@ public class ElevatorSAClass {
             return false;
     }
 
-
-    // ------------------------------------------------------------
-    // Conditions from V1_UP / V1_DOWN
-    // Same functions are used for both directions
-    // ------------------------------------------------------------
-
-    private boolean canMoveFromV1ToV2() {
-        // For UP and DOWN:
-        // - no emergency stop was active recently
-        // - 0.5 seconds after V1 start
-        return false;
+    //v2 up state transitions
+    private boolean U2()
+    {
+        //one sec after approach sensor triggort (0,5m) left
+        //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
+        if (getAppraochTimer()>= 1000 && centralLogic.getReachedSensors(callLogic.getCurrentLevel()) == callLogic.getNextLevel())
+        {
+            stopApproachTimer();
+            return true;
+        }
+        else
+            return false;
     }
 
-    private boolean canEnterCrawlFromV1() {
-        // Enter crawl when:
-        // - lower safety of target level is reached
-        return false;
+
+
+
+    //ES
+    private boolean ES()
+    {
+        if(opcuaInput.getEmergencyStop())
+            return true;
+        else
+            return false;
     }
 
-    // ------------------------------------------------------------
-    // Conditions from V2_UP / V2_DOWN
-    // Same functions are used for both directions
-    // ------------------------------------------------------------
 
-    private boolean canMoveFromV2ToV1() {
-        // For UP and DOWN:
-        // - after approach sensor starts, wait 1 second
-        // - then check if approach sensor level equals target level
-        return false;
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     //spezial funktions

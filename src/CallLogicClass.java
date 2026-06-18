@@ -83,4 +83,14 @@ public class CallLogicClass {
     {
         return difference;
     }
+
+    public int getCurrentLevel()
+    {
+        return currentLevel;
+    }
+
+    public int getNextLevel()
+    {
+        return nextLevel;
+    }
 }

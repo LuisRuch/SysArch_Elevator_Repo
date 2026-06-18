@@ -27,7 +27,7 @@ public class OPCUAInputClass {
 
 
 
-
+    //ei ei ei. ich brauche den zugriff auf Central Logic und dann muss ich setten
     private boolean[] stops = new boolean[5];                                            //stops[1] = level 1, stops[2] = level 2, stops[3] = level 3, stops[4] = level 4
     private CentralLogicClass.Req_Dir[] Req_Dir_Array = new CentralLogicClass.Req_Dir[3];                //[2] = level 2, [3] = level 3
 

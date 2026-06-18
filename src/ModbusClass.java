@@ -60,6 +60,7 @@ public class ModbusClass {
     private boolean[] statusInputs;      // IX10.0 bis IX10.4
     private long[] specialInputs;        // [0] cycles, [1] aufzugID, [2] speed
 
+    private boolean[] reachedSensors = new boolean[5];
 
     // Modbus config
     public ModbusClass() throws UnknownHostException, IOException {
@@ -121,6 +122,14 @@ public class ModbusClass {
 
     public long[] getSpecialInputs() {
         return specialInputs;
+    }
+
+    public boolean[] getReachsensors() {
+        reachedSensors[1] = client.ReadDiscreteInputs(Input_l1r, 1);
+        reachedSensors[2] = client.ReadDiscreteInputs(Input_l2r, 1);
+        reachedSensors[3] = client.ReadDiscreteInputs(Input_l3r, 1);
+        reachedSensors[4] = client.ReadDiscreteInputs(Input_l4r, 1);
+        return reachedSensors;
     }
 
 
