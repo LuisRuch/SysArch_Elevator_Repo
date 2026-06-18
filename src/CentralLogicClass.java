@@ -1,4 +1,4 @@
-public class LogicClass {
+public class CentralLogicClass {
 
     /*
      * Array-Zuordnung der eingelesenen Inputs
@@ -49,7 +49,7 @@ public class LogicClass {
     //Variables for elevator levels - passed to HMI-Class
     private boolean[] stops = new boolean[5];                        //stops[1] = level 1, stops[2] = level 2, stops[3] = level 3, stops[4] = level 4
     public enum Req_Dir {Up, Down , DontCare};                      //Requested direction
-    private Req_Dir[] Req_Dir_Array = new Req_Dir[5];
+    private LogicClass.Req_Dir[] Req_Dir_Array = new LogicClass.Req_Dir[5];
 
     private boolean runningModbus = false;
     private boolean runningRest = false;
@@ -110,9 +110,6 @@ public class LogicClass {
         //pollingModbusThread.setDaemon(true); // Thread stops if main stops
         pollingRestThread.start();
     }
-
-
-
 
 
 }

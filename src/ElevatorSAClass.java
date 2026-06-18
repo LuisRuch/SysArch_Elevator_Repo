@@ -3,6 +3,8 @@ public class ElevatorSAClass {
     private State currentState = State.STOPPED_CLOSED_DOOR;
     private State lastState = State.STOPPED_CLOSED_DOOR;
 
+    public ElevatorSAClass() {}
+
     public enum State {
         STOPPED_CLOSED_DOOR,
         STOPPED_OPEN_DOOR,
@@ -13,7 +15,7 @@ public class ElevatorSAClass {
         CRAWL
     }
 
-    private void handleStateTransitions() {
+    public void handleStateTransitions() {
 
         switch (currentState) {
 
@@ -106,6 +108,7 @@ public class ElevatorSAClass {
         lastState = currentState;
         currentState = newState;
 
+        // kann mann auch fpr die anderen machen dann wird nur einemal gesetzt und nicht immer wieder neu -> weniger communication über Modbus
         if(newState == State.CRAWL)
         {
             gehtDoch();
