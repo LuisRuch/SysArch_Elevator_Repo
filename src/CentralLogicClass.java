@@ -79,7 +79,7 @@ public class CentralLogicClass {
         this.modbus = modbus;
 
         callLogic = new CallLogicClass(stops,Req_Dir_Array,this);
-        opcuaInput = new OPCUAInputClass(stops,Req_Dir_Array);
+        opcuaInput = new OPCUAInputClass(this);
         elevatorSA = new ElevatorSAClass(this,opcuaInput,modbus,callLogic);
 
     }
@@ -348,8 +348,8 @@ public class CentralLogicClass {
         return Req_Dir_Array;
     }
 
-    public void setReq_Dir_Array(Req_Dir[] req_Dir_Array) {
-        this.Req_Dir_Array = req_Dir_Array;
+    public void setReq_Dir_Array(int index, Req_Dir reqDir) {
+        this.Req_Dir_Array[index] = reqDir;
     }
 
     public boolean[] getLevelInputs() {
