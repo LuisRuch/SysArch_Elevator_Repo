@@ -60,6 +60,9 @@ public class CentralLogicClass {
     private boolean[] statusInputs;      // IX10.0 bis IX10.4
     private long[] specialInputs;        // [0] cycles, [1] aufzugID, [2] speed
 
+    private boolean approachTimerUPRunning = false;
+    private long approachTimerStartUP = 0;
+
     ModbusClass modbus;
 
     CallLogicClass callLogic;
@@ -131,6 +134,8 @@ public class CentralLogicClass {
             mode = Mode.OnCall;
         }
 
+        checkApproachTimer();
+
         //des kann noch in CallLogic gebaut werden
         difference = callLogic.getnextLevel() - callLogicurrentLevel;
     }
@@ -144,9 +149,77 @@ public class CentralLogicClass {
         return false;
     }
 
+    //working with timestamps - no timer
+    public void checkApproachTimer() {
+        if (levelInputs == null) {
+            return;
+        }
+
+        // nextLevel 2: Lower Approach L2 = index 7, Upper Approach L2 = index 11
+        if (callLogic.getNextLevel() == 2) {
+            if (approachTimerUPRunning && levelInputs[11]) {
+                approachTimerUPRunning = false;
+                return;
+            }
+
+            if (!approachTimerUPRunning && levelInputs[7]) {
+                approachTimerUPRunning = true;
+                approachTimerStartUP = System.currentTimeMillis();
+            }
+        }
+
+        // nextLevel 3: Lower Approach L3 = index 15, Upper Approach L3 = index 19
+        else if (callLogic.getNextLevel() == 3) {
+            if (approachTimerUPRunning && levelInputs[19]) {
+                approachTimerUPRunning = false;
+                return;
+            }
+
+            if (!approachTimerUPRunning && levelInputs[15]) {
+                approachTimerUPRunning = true;
+                approachTimerStartUP = System.currentTimeMillis();
+            }
+        }
+
+        // nextLevel 4: Lower Approach L4 = index 23
+        // Für Level 4 hast du keinen Upper Approach Sensor definiert
+        else if (callLogic.getNextLevel() == 4) {
+            if (!approachTimerUPRunning && levelInputs[23]) {
+                approachTimerUPRunning = true;
+                approachTimerStartUP = System.currentTimeMillis();
+            }
+        }
+    }
+
+    public boolean getAnySaftyStop() {
+        if (levelInputs == null) {
+            return false;
+        }
+
+        return levelInputs[0]   // L1 SL
+                || levelInputs[2]   // L1 SU
+                || levelInputs[8]   // L2 SL
+                || levelInputs[10]  // L2 SU
+                || levelInputs[16]  // L3 SL
+                || levelInputs[18]  // L3 SU
+                || levelInputs[24]  // L4 SL
+                || levelInputs[26]; // L4 SU
+    }
 
 
     //Getter und Setter
+
+    public long getApproachTimerMillisSeconds() {
+        if (!approachTimerUPRunning) {
+            return 0;
+        }
+
+        return (System.currentTimeMillis() - approachTimerStartUP)/1000;
+    }
+
+    public long setApproachTimerUp(boolean set){
+        approachTimerUPRunning = set;
+    }
 
     public boolean[] getStops() {
         return stops;

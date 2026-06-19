@@ -262,11 +262,19 @@ public class ElevatorSAClass {
     {
         //one sec after approach sensor triggort (0,5m) left
         //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
-        if (getALimer()>= 1000 && modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel())
+        if (centralLogic.getApproachTimerMillisSeconds() >= 1000 && modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel())
         {
-            stopALTimer();
+            centralLogic.setApproachTimerUp(false);
             return true;
         }
+        else
+            return false;
+    }
+
+    private boolean U3()
+    {
+        if((modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySaftyStop())
+            return true;
         else
             return false;
     }
