@@ -20,7 +20,7 @@ public class CallLogicClass {
     }
 
     //hier noch restrection, dass wenn in zustand v1 dass dannn nicht mehr ge#ndert werden kann
-    public int ChangeNextLevel() {
+    public void UpdateNextLevel() {
 
         if (DirOfTrv == CentralLogicClass.Req_Dir.Up) {
             for (int i = currentLevel; i <= maxLevel; i++) {
@@ -31,10 +31,12 @@ public class CallLogicClass {
                             (DirOfTrv == Req_Dir_Array[i])) {
 
                         nextLevel = i;
-                        return i;
+                        difference = Math.abs(nextLevel - currentLevel);
+                        return;
                     } else {
                         nextLevel = i;
-                        return i;
+                        difference = Math.abs(nextLevel - currentLevel);
+                        return;
                     }
                 }
             }
@@ -49,10 +51,12 @@ public class CallLogicClass {
                             (DirOfTrv == Req_Dir_Array[i])) {
 
                         nextLevel = i;
-                        return i;
+                        difference = Math.abs(nextLevel - currentLevel);
+                        return;
                     } else {
                         nextLevel = i;
-                        return i;
+                        difference = Math.abs(nextLevel - currentLevel);
+                        return;
                     }
                 }
             }
@@ -72,12 +76,12 @@ public class CallLogicClass {
                         DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
                     }
 
-                    return i;
+                    difference = Math.abs(nextLevel - currentLevel);
+                    return;
                 }
             }
         }
-
-        return currentLevel;
+        difference = Math.abs(nextLevel - currentLevel);
     }
 
     public int getdiffernce()

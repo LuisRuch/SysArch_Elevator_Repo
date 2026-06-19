@@ -113,6 +113,7 @@ public class CentralLogicClass {
             while (runningRest) {
                 try {
                     opcuaInput.handleInputs();
+                    callLogic.UpdateNextLevel();
                     calcfunctions();
                     elevatorSA.handleStateTransitions();
                     Thread.sleep(200);
