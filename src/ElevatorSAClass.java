@@ -75,7 +75,8 @@ public class ElevatorSAClass {
                 }
             }
 
-            case V1_UP -> {
+            //same transitions
+            case V1_UP, V1_DOWN -> {
                 if (ES()) {
                     changeState(State.STOPPED_CLOSED_DOOR);
                 }
@@ -90,15 +91,6 @@ public class ElevatorSAClass {
                 }
                 else if (D2()) {
                     changeState(State.V1_DOWN);
-                }
-            }
-
-            case V1_DOWN -> {
-                if (ES()) {
-                    changeState(State.STOPPED_CLOSED_DOOR);
-                }
-                else if (D3()) {
-                    changeState(State.CRAWL);
                 }
             }
 
@@ -262,7 +254,7 @@ public class ElevatorSAClass {
     {
         //one sec after approach sensor triggort (0,5m) left
         //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
-        if (centralLogic.getApproachTimerMillisSeconds() >= 1000 && modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel())
+        if (centralLogic.getApproachTimerUPMillisSeconds() >= 1000 && modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel())
         {
             centralLogic.setApproachTimerUp(false);
             return true;
@@ -273,14 +265,37 @@ public class ElevatorSAClass {
 
     private boolean U3()
     {
+        //and level approach sensor == level form destination
+        //and
+        //saftey sensor - no matter which one -> physical space of elevator important
         if((modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySaftyStop())
             return true;
         else
             return false;
     }
 
+    //v2 down state transitions
+    private boolean D2()
+    {
+        //one sec after approach sensor triggort (0,5m) left
+        //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
+        if (centralLogic.getApproachTimerDOWNMillisSeconds() >= 1000 && modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel())
+        {
+            centralLogic.setApproachTimerDOWN(false);
+            return true;
+        }
+        else
+            return false;
+    }
 
-
+    //crawl
+    private boolean finish()
+    {
+        if(centralLogic.checkReachedTimer() && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[24]))
+            return true;
+        else
+            return false;
+    }
 
     //ES
     private boolean ES()
@@ -292,26 +307,8 @@ public class ElevatorSAClass {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     //spezial funktions
+    //herer only used thread for timer
     public void startDoorTimer() {
         schedulerDoor = Executors.newSingleThreadScheduledExecutor();
 

@@ -56,12 +56,17 @@ public class CentralLogicClass {
     private boolean runningModbus = false;
     private boolean runningRest = false;
 
+
     private boolean[] levelInputs;       // IX0.1 bis IX3.3
     private boolean[] statusInputs;      // IX10.0 bis IX10.4
     private long[] specialInputs;        // [0] cycles, [1] aufzugID, [2] speed
 
     private boolean approachTimerUPRunning = false;
     private long approachTimerStartUP = 0;
+    private boolean approachTimerDOWNRunning = false;
+    private long approachTimerStartDOWN = 0;
+    private boolean reachedTimerRunning = false;
+    private long reachedTimerStart = 0;
 
     ModbusClass modbus;
 
@@ -134,7 +139,9 @@ public class CentralLogicClass {
             mode = Mode.OnCall;
         }
 
-        checkApproachTimer();
+        checkApproachTimerUP();
+        checkApproachTimerDOWN();
+        checkReachedTimer();
 
         //des kann noch in CallLogic gebaut werden
         difference = callLogic.getnextLevel() - callLogicurrentLevel;
@@ -150,7 +157,7 @@ public class CentralLogicClass {
     }
 
     //working with timestamps - no timer
-    public void checkApproachTimer() {
+    public void checkApproachTimerUP() {
         if (levelInputs == null) {
             return;
         }
@@ -191,6 +198,126 @@ public class CentralLogicClass {
         }
     }
 
+    public void checkApproachTimerDOWN() {
+        if (levelInputs == null) {
+            return;
+        }
+
+        // nextLevel 1: Upper Approach L1 = index 3
+        // Für Level 1 hast du keinen Lower Approach Sensor definiert
+        if (callLogic.getNextLevel() == 1) {
+            if (!approachTimerDOWNRunning && levelInputs[3]) {
+                approachTimerDOWNRunning = true;
+                approachTimerStartDOWN = System.currentTimeMillis();
+            }
+        }
+
+        // nextLevel 2: Upper Approach L2 = index 11, Lower Approach L2 = index 7
+        else if (callLogic.getNextLevel() == 2) {
+            if (approachTimerDOWNRunning && levelInputs[7]) {
+                approachTimerDOWNRunning = false;
+                return;
+            }
+
+            if (!approachTimerDOWNRunning && levelInputs[11]) {
+                approachTimerDOWNRunning = true;
+                approachTimerStartDOWN = System.currentTimeMillis();
+            }
+        }
+
+        // nextLevel 3: Upper Approach L3 = index 19, Lower Approach L3 = index 15
+        else if (callLogic.getNextLevel() == 3) {
+            if (approachTimerDOWNRunning && levelInputs[15]) {
+                approachTimerDOWNRunning = false;
+                return;
+            }
+
+            if (!approachTimerDOWNRunning && levelInputs[19]) {
+                approachTimerDOWNRunning = true;
+                approachTimerStartDOWN = System.currentTimeMillis();
+            }
+        }
+    }
+
+    public boolean checkReachedTimer() {
+        if (levelInputs == null) {
+            return false;
+        }
+
+        boolean reachedSensorActive = false;
+
+        // nextLevel 1: Reached Sensor L1 = index 1
+        if (callLogic.getNextLevel() == 1) {
+            reachedSensorActive = levelInputs[1];
+        }
+
+        // nextLevel 2: Reached Sensor L2 = index 9
+        else if (callLogic.getNextLevel() == 2) {
+            reachedSensorActive = levelInputs[9];
+        }
+
+        // nextLevel 3: Reached Sensor L3 = index 17
+        else if (callLogic.getNextLevel() == 3) {
+            reachedSensorActive = levelInputs[17];
+        }
+
+        // nextLevel 4: Reached Sensor L4 = index 25
+        else if (callLogic.getNextLevel() == 4) {
+            reachedSensorActive = levelInputs[25];
+        }
+
+        // Timer starten, wenn Reached Sensor aktiv ist
+        if (!reachedTimerRunning && reachedSensorActive) {
+            reachedTimerRunning = true;
+            reachedTimerStart = System.currentTimeMillis();
+        }
+
+        // Wenn Timer nicht läuft, false zurückgeben
+        if (!reachedTimerRunning) {
+            return false;
+        }
+
+        long elapsedMillis = System.currentTimeMillis() - reachedTimerStart;
+
+        // Nach 2 Sekunden Timer stoppen
+        if (elapsedMillis >= 2000) {
+            reachedTimerRunning = false;
+            return false;
+        }
+
+        // Nach 1 Sekunde true zurückgeben
+        return elapsedMillis >= 1000;
+    }
+
+
+
+    //Getter und Setter
+
+    public long getApproachTimerUPMillisSeconds() {
+        if (!approachTimerUPRunning) {
+            return 0;
+        }
+
+        return (System.currentTimeMillis() - approachTimerStartUP)/1000;
+    }
+
+    public void setApproachTimerUp(boolean set){
+        approachTimerUPRunning = set;
+    }
+
+    public long getApproachTimerDOWNMillisSeconds() {
+        if (!approachTimerDOWNRunning) {
+            return 0;
+        }
+
+        return (System.currentTimeMillis() - approachTimerStartDOWN) / 1000;
+    }
+
+    public void setApproachTimerDOWN(boolean set) {
+        approachTimerDOWNRunning = set;
+    }
+
+
     public boolean getAnySaftyStop() {
         if (levelInputs == null) {
             return false;
@@ -207,19 +334,7 @@ public class CentralLogicClass {
     }
 
 
-    //Getter und Setter
 
-    public long getApproachTimerMillisSeconds() {
-        if (!approachTimerUPRunning) {
-            return 0;
-        }
-
-        return (System.currentTimeMillis() - approachTimerStartUP)/1000;
-    }
-
-    public long setApproachTimerUp(boolean set){
-        approachTimerUPRunning = set;
-    }
 
     public boolean[] getStops() {
         return stops;

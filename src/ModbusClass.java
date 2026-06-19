@@ -61,6 +61,7 @@ public class ModbusClass {
     private long[] specialInputs;        // [0] cycles, [1] aufzugID, [2] speed
 
     private int lastLowerApproachSensorLevel = 0;
+    private int lastUpperApproachSensorLevel = 0;
 
     // Modbus config
     public ModbusClass() throws UnknownHostException, IOException {
@@ -131,16 +132,34 @@ public class ModbusClass {
             return;
         }
 
-        if (levelInputs[Input_l2al - Input_l1sl]) {
+        if (levelInputs[7]) {
             lastLowerApproachSensorLevel = 2;
-        } else if (levelInputs[Input_l3al - Input_l1sl]) {
+        } else if (levelInputs[15]) {
             lastLowerApproachSensorLevel = 3;
-        } else if (levelInputs[Input_l4al - Input_l1sl]) {
+        } else if (levelInputs[23]) {
             lastLowerApproachSensorLevel = 4;
         }
     }
 
     public int getLastLowerApproachSensorLevel() {
+        return lastLowerApproachSensorLevel;
+    }
+
+    public void updateLastUpperApproachSensorFromLevelInputs() {
+        if (levelInputs == null) {
+            return;
+        }
+
+        if (levelInputs[3]) {
+            lastUpperApproachSensorLevel = 1;
+        } else if (levelInputs[11]) {
+            lastUpperApproachSensorLevel = 2;
+        } else if (levelInputs[19]) {
+            lastUpperApproachSensorLevel = 3;
+        }
+    }
+
+    public int getLastUpperApproachSensorLevel() {
         return lastLowerApproachSensorLevel;
     }
 
