@@ -13,7 +13,6 @@ public class Main {
 
         //creates CentralLogic Class + passes references
         CentralLogicClass central = new CentralLogicClass(modbus);
-            central.startPollingModbus();
-            central.startPollingRest();
+            central.start();
     }
 }

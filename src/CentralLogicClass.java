@@ -53,9 +53,6 @@ public class CentralLogicClass {
     public enum Mode {OnCall, IDLE}
     private Mode mode = Mode.IDLE;
 
-    private boolean runningModbus = false;
-    private boolean runningRest = false;
-
 
     private boolean[] levelInputs;       // IX0.1 bis IX3.3
     private boolean[] statusInputs;      // IX10.0 bis IX10.4
@@ -73,6 +70,7 @@ public class CentralLogicClass {
     CallLogicClass callLogic;
     OPCUAInputClass opcuaInput;
     ElevatorSAClass elevatorSA;
+    PollingClass polling;
 
     public CentralLogicClass(ModbusClass modbus)
     {
@@ -81,49 +79,14 @@ public class CentralLogicClass {
         callLogic = new CallLogicClass(stops,Req_Dir_Array,this);
         opcuaInput = new OPCUAInputClass(this);
         elevatorSA = new ElevatorSAClass(this,opcuaInput,modbus,callLogic);
+        polling = new PollingClass(this,callLogic,opcuaInput,elevatorSA, modbus);
 
     }
-    //start Modbus
-    public void startPollingModbus()
-    {
-        runningModbus = true;
-        Thread pollingModbusThread = new Thread(() -> {
-            while (runningModbus) {
-                try {
-                    modbus.readAllInputs();
-                    levelInputs = modbus.getLevelInputs();
-                    statusInputs = modbus.getStatusInputs();
-                    specialInputs = modbus.getSpecialInputs();
-                    modbus.updateLastLowerApproachSensorFromLevelInputs();
-                    modbus.updateLastUpperApproachSensorFromLevelInputs();
-                    Thread.sleep(200);
-                } catch (Exception e) {
-                    System.err.println("Modbus reading error: " + e.getMessage());
-                }
-            }
-        });
-        //pollingModbusThread.setDaemon(true); // Thread stops if main stops
-        pollingModbusThread.start();
-    }
 
-    public void startPollingRest()
+    public void start()
     {
-        runningRest = true;
-        Thread pollingRestThread = new Thread(() -> {
-            while (runningRest) {
-                try {
-                    opcuaInput.handleInputs();
-                    callLogic.UpdateNextLevel();
-                    calcfunctions();
-                    elevatorSA.handleStateTransitions();
-                    Thread.sleep(200);
-                } catch (Exception e) {
-                    System.err.println("Rest reading error: " + e.getMessage());
-                }
-            }
-        });
-        //pollingModbusThread.setDaemon(true); // Thread stops if main stops
-        pollingRestThread.start();
+        polling.startPollingModbus();
+        polling.startPollingRest();
     }
 
 
@@ -366,5 +329,16 @@ public class CentralLogicClass {
 
     public Mode getMode() {
         return mode;
+    }
+    public void setLevelInputs(boolean[] levelInputs) {
+        this.levelInputs = levelInputs;
+    }
+
+    public void setStatusInputs(boolean[] statusInputs) {
+        this.statusInputs = statusInputs;
+    }
+
+    public void setSpecialInputs(long[] specialInputs) {
+        this.specialInputs = specialInputs;
     }
 }
