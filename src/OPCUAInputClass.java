@@ -95,82 +95,6 @@ public class OPCUAInputClass {
 
 
     //Getter und Setter
-    public boolean getInsideLevel1() {
-        return insideLevel1;
-    }
-
-    public void setInsideLevel1(boolean insideLevel1) {
-        this.insideLevel1 = insideLevel1;
-    }
-
-    public boolean getInsideLevel2() {
-        return insideLevel2;
-    }
-
-    public void setInsideLevel2(boolean insideLevel2) {
-        this.insideLevel2 = insideLevel2;
-    }
-
-    public boolean getInsideLevel3() {
-        return insideLevel3;
-    }
-
-    public void setInsideLevel3(boolean insideLevel3) {
-        this.insideLevel3 = insideLevel3;
-    }
-
-    public boolean getInsideLevel4() {
-        return insideLevel4;
-    }
-
-    public void setInsideLevel4(boolean insideLevel4) {
-        this.insideLevel4 = insideLevel4;
-    }
-
-    public boolean getOutsideLevel1Up() {
-        return outsideLevel1Up;
-    }
-
-    public void setOutsideLevel1Up(boolean outsideLevel1Up) {
-        this.outsideLevel1Up = outsideLevel1Up;
-    }
-
-    public boolean getOutsideLevel2Up() {
-        return outsideLevel2Up;
-    }
-
-    public void setOutsideLevel2Up(boolean outsideLevel2Up) {
-        this.outsideLevel2Up = outsideLevel2Up;
-    }
-
-    public boolean getOutsideLevel2Down() {
-        return outsideLevel2Down;
-    }
-
-    public void setOutsideLevel2Down(boolean outsideLevel2Down) {
-        this.outsideLevel2Down = outsideLevel2Down;
-    }
-
-    public boolean getOutsideLevel3Up() {
-        return outsideLevel3Up;
-    }
-
-    public void setOutsideLevel3Up(boolean outsideLevel3Up) {
-        this.outsideLevel3Up = outsideLevel3Up;
-    }
-
-    public boolean getOutsideLevel3Down() {
-        return outsideLevel3Down;
-    }
-
-    public void setOutsideLevel3Down(boolean outsideLevel3Down) {
-        this.outsideLevel3Down = outsideLevel3Down;
-    }
-
-    public boolean getOutsideLevel4Down() {
-        return outsideLevel4Down;
-    }
-
     public void setOutsideLevel4Down(boolean outsideLevel4Down) {
         this.outsideLevel4Down = outsideLevel4Down;
     }
@@ -179,24 +103,13 @@ public class OPCUAInputClass {
         return OpenDoor;
     }
 
-    public void setOpenDoor(boolean openDoor) {
-        OpenDoor = openDoor;
-    }
-
     public boolean getCloseDoor() {
         return CloseDoor;
-    }
-
-    public void setCloseDoor(boolean closeDoor) {
-        CloseDoor = closeDoor;
     }
 
     public boolean getEmergencyStop() {
         return emergencyStop;
     }
 
-    public void setEmergencyStop(boolean emergencyStop) {
-        this.emergencyStop = emergencyStop;
-    }
 
 }
