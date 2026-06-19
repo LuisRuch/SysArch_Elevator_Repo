@@ -43,6 +43,10 @@ public class ElevatorSAClass {
                 if (door1()) {
                     changeState(State.STOPPED_OPEN_DOOR);
                 }
+                //if in level and reach sensor then rest stop[] at that level
+                else if(centralLogic.getStops()[callLogic.getCurrentLevel()] && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[24]))
+                    centralLogic.setStops(callLogic.getCurrentLevel(),false);
+
                 else if (AESU()) {
                     changeState(State.V1_UP);
                 }
@@ -58,6 +62,8 @@ public class ElevatorSAClass {
                 else if (AESC()) {
                     changeState(State.CRAWL);
                 }
+
+
             }
 
             case STOPPED_OPEN_DOOR -> {

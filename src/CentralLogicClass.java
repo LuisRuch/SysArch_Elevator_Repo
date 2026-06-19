@@ -95,6 +95,7 @@ public class CentralLogicClass {
                     statusInputs = modbus.getStatusInputs();
                     specialInputs = modbus.getSpecialInputs();
                     modbus.updateLastLowerApproachSensorFromLevelInputs();
+                    modbus.updateLastUpperApproachSensorFromLevelInputs();
                     Thread.sleep(200);
                 } catch (Exception e) {
                     System.err.println("Modbus reading error: " + e.getMessage());
@@ -143,8 +144,6 @@ public class CentralLogicClass {
         checkApproachTimerDOWN();
         checkReachedTimer();
 
-        //des kann noch in CallLogic gebaut werden
-        difference = callLogic.getnextLevel() - callLogicurrentLevel;
     }
 
     public boolean hasAnyStop() {
@@ -340,8 +339,8 @@ public class CentralLogicClass {
         return stops;
     }
 
-    public void setStops(boolean[] stops) {
-        this.stops = stops;
+    public void setStops(int index,boolean state) {
+        this.stops[index] = state;
     }
 
     public Req_Dir[] getReq_Dir_Array() {
