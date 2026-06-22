@@ -51,7 +51,14 @@ public class PollingClass {
                     opcuaInput.handleInputs();
                     if(opcuaInput.getSupervisor())
                     {
-                        callLogic.UpdateNextLevel();
+                        //if v1u/d or crawl or stopped aber kein reached -> skip updateNextLevel
+                        if (elevatorSA.getCurrentState() != ElevatorSAClass.State.V1_UP
+                                && elevatorSA.getCurrentState() != ElevatorSAClass.State.V1_DOWN
+                                && elevatorSA.getCurrentState() != ElevatorSAClass.State.CRAWL
+                                && (elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED
+                                || centralLogic.getReachedSensorActive()))
+                            callLogic.UpdateNextLevel();
+
                         centralLogic.calcfunctions();
                         elevatorSA.handleStateTransitions();
                     }
