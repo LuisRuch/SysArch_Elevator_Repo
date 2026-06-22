@@ -5,7 +5,7 @@ public class CallLogicClass {
     // this information will be given to the class Motor_Logic
 
     private CentralLogicClass.Req_Dir DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
-    private int currentLevel = 0;
+    private int currentLevel = 1;
     private int nextLevel = 1;
     private int maxLevel = 4;
     private int minLevel = 1;
@@ -21,7 +21,6 @@ public class CallLogicClass {
 
     //hier noch restrection, dass wenn in zustand v1 dass dannn nicht mehr ge#ndert werden kann
     public void UpdateNextLevel() {
-
         if (DirOfTrv == CentralLogicClass.Req_Dir.Up) {
             for (int i = currentLevel; i <= maxLevel; i++) {
 
@@ -31,11 +30,11 @@ public class CallLogicClass {
                             (DirOfTrv == Req_Dir_Array[i])) {
 
                         nextLevel = i;
-                        difference = Math.abs(nextLevel - currentLevel);
+                        difference = nextLevel - currentLevel;
                         return;
                     } else {
                         nextLevel = i;
-                        difference = Math.abs(nextLevel - currentLevel);
+                        difference = nextLevel - currentLevel;
                         return;
                     }
                 }
@@ -51,11 +50,11 @@ public class CallLogicClass {
                             (DirOfTrv == Req_Dir_Array[i])) {
 
                         nextLevel = i;
-                        difference = Math.abs(nextLevel - currentLevel);
+                        difference = nextLevel - currentLevel;
                         return;
                     } else {
                         nextLevel = i;
-                        difference = Math.abs(nextLevel - currentLevel);
+                        difference = nextLevel - currentLevel;
                         return;
                     }
                 }
@@ -76,12 +75,12 @@ public class CallLogicClass {
                         DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
                     }
 
-                    difference = Math.abs(nextLevel - currentLevel);
+                    difference = nextLevel - currentLevel;
                     return;
                 }
             }
         }
-        difference = Math.abs(nextLevel - currentLevel);
+        difference = nextLevel - currentLevel;
     }
 
     public int getdiffernce()
@@ -89,13 +88,38 @@ public class CallLogicClass {
         return difference;
     }
 
+    public void setDifference(int diff)
+    {
+        difference = diff;
+    }
+
     public int getCurrentLevel()
     {
         return currentLevel;
     }
 
+    public void setCurrentLevel(int curr)
+    {
+        currentLevel = curr;
+    }
+
     public int getNextLevel()
     {
         return nextLevel;
+    }
+
+    public void setNextLevel(int next)
+    {
+        nextLevel = next;
+    }
+
+    public void setDirOfTrv(CentralLogicClass.Req_Dir DirOfTrv)
+    {
+        this.DirOfTrv = DirOfTrv;
+    }
+
+    public CentralLogicClass.Req_Dir getDirOfTrv()
+    {
+        return DirOfTrv;
     }
 }

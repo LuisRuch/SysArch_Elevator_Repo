@@ -10,9 +10,11 @@ sauber des mit dem exeptions machen
 
 Does call logic work
 
+kann modbus von zwei threads verwendet werden einer list einer schreibt. ghet auch in einem theoretisch
 
 //aufgaben
-Rest - bei State automat
+crawl machen
+update next level soll in v1 und crawl nicht aufgerufen werden. oder wenn im emergency stop - aber achtung emergency stop kann gelöst werden und dann kann wird nues next level obwohl er dann wieder in crawl geht weil er da abgebrochen wurden ist.
 sachen in central logic. statt eg. modbus/elvator ea
 unnötige get set löschen
 Null prüfung

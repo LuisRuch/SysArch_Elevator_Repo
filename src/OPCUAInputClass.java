@@ -99,11 +99,6 @@ public class OPCUAInputClass {
         }
 
         //supervisor functions
-        if (reset) {
-            modbus.resetSimulation();
-        }
-
-
         if (speedV1Up) {
             modbus.startMotorUpV1();
         }
@@ -128,10 +123,6 @@ public class OPCUAInputClass {
 
 
     //Getter und Setter
-    public void setOutsideLevel4Down(boolean outsideLevel4Down) {
-        this.outsideLevel4Down = outsideLevel4Down;
-    }
-
     public boolean getOpenDoor() {
         return OpenDoor;
     }
@@ -142,6 +133,10 @@ public class OPCUAInputClass {
 
     public boolean getEmergencyStop() {
         return emergencyStop;
+    }
+
+    public boolean getReset(){
+        return reset;
     }
 
 

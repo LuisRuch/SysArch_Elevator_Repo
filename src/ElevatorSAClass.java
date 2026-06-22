@@ -25,6 +25,7 @@ public class ElevatorSAClass {
     }
 
     public enum State {
+        RESETTING,
         STOPPED,
         OPENING_DOOR,
         CLOSING_DOOR,
@@ -38,30 +39,45 @@ public class ElevatorSAClass {
     public void handleStateTransitions()throws Exception
     {
 
+        if (opcuaInput.getReset() && currentState != State.RESETTING) {
+            changeState(State.RESETTING);
+            return;
+        }
+
         switch (currentState) {
+
+            case RESETTING -> {
+                if (!opcuaInput.getReset()) {
+                    changeState(State.STOPPED);
+                }
+            }
 
             case STOPPED -> {
 
-                //if in level and reach sensor then rest stop[] at that level
-                if(centralLogic.getStops()[callLogic.getCurrentLevel()] && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[24]))
-                    centralLogic.setStops(callLogic.getCurrentLevel(),false);
-
-                if (do1()) {
+                //has to be before erasing stops / has to be if
+                if (do1() && centralLogic.getStatusInputs()[1]) {
                     changeState(State.OPENING_DOOR);
                 }
-                else if(dc1()){
+
+                //has to be if
+                //if in level and reach sensor then rest stop[] at that level
+                if(centralLogic.getStops()[callLogic.getCurrentLevel()] && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[25]))
+                    centralLogic.setStops(callLogic.getCurrentLevel(),false);
+
+                //here if else can start
+                if(dc1() && centralLogic.getStatusInputs()[0]){
                     changeState(State.CLOSING_DOOR);
                 }
                 else if (AESU()) {
                     changeState(State.V1_UP);
                 }
-                else if (U1()) {
+                else if (U1()&& centralLogic.getStatusInputs()[1]) { //closed door to start moving
                     changeState(State.V2_UP);
                 }
                 else if (AESD()) {
                     changeState(State.V1_DOWN);
                 }
-                else if (D1()) {
+                else if (D1()&& centralLogic.getStatusInputs()[1]) { //closed door to start moving
                     changeState(State.V2_DOWN);
                 }
                 else if (AESC()) {
@@ -113,7 +129,11 @@ public class ElevatorSAClass {
 
             case CRAWL -> {
 
-                if (ES() || finish()) {
+                if (ES()) {
+                    changeState(State.STOPPED);
+                }
+                else if (finish()){
+                    callLogic.setCurrentLevel(callLogic.getNextLevel());
                     changeState(State.STOPPED);
                 }
             }
@@ -134,6 +154,10 @@ public class ElevatorSAClass {
 
         //on entry of state the follwoing actions will be caried out
         switch (newState) {
+            case RESETTING:
+                performReset();
+                break;
+
             case STOPPED:
                 modbus.stopMotor();
                 modbus.stopDoor();
@@ -187,11 +211,10 @@ public class ElevatorSAClass {
     private boolean do1() {
         //Automatic open door, if elevator arrived at destination - no Emergency Stop  && last State was crawl
         //or
-        //open door if no call and button clicked to open door
-        //or
+
         //if had no calls(IDLE) and (new)request in same level as current elevator
 
-        if((!opcuaInput.getEmergencyStop() && lastState == State.CRAWL) || (!centralLogic.getStops()[0] && opcuaInput.getOpenDoor()) || centralLogic.getMode() == CentralLogicClass.Mode.IDLE)
+        if((!opcuaInput.getEmergencyStop() && lastState == State.CRAWL)  || (centralLogic.getMode() == CentralLogicClass.Mode.IDLE && centralLogic.getStops()[callLogic.getCurrentLevel()] && !opcuaInput.getEmergencyStop()))
             return true;
 
         else
@@ -251,7 +274,43 @@ public class ElevatorSAClass {
             return false;
     }
 
+    //Rest
+    private void performReset() throws Exception {
 
+
+        modbus.stopMotor();
+        modbus.stopDoor();
+        modbus.resetSimulation();
+
+
+        stopDoorTimer();
+        centralLogic.setApproachTimerUp(false);
+        centralLogic.setApproachTimerDOWN(false);
+        timerDoorLevel = 0;
+
+
+        centralLogic.setStops(1,false);
+        centralLogic.setStops(2,false);
+        centralLogic.setStops(3,false);
+        centralLogic.setStops(4,false);
+        centralLogic.setReq_Dir_Array(1, CentralLogicClass.Req_Dir.DontCare);
+        centralLogic.setReq_Dir_Array(2, CentralLogicClass.Req_Dir.DontCare);
+        centralLogic.setReq_Dir_Array(3, CentralLogicClass.Req_Dir.DontCare);
+        centralLogic.setReq_Dir_Array(4, CentralLogicClass.Req_Dir.DontCare);
+        centralLogic.setApproachTimerUp(false);
+        centralLogic.setApproachTimerStartUP(0);
+        centralLogic.setApproachTimerDOWN(false);
+        centralLogic.setApproachTimerStartDOWN(0);
+        centralLogic.setReachedTimerRunning(false);
+        centralLogic.setReachedTimerStart(0);
+        centralLogic.setMode(CentralLogicClass.Mode.IDLE);
+        modbus.setLastLowerApproachSensorLevel(0);
+        modbus.setLastUpperApproachSensorLevel(0);
+        callLogic.setCurrentLevel(1);
+        callLogic.setDifference(0);
+        callLogic.setNextLevel(1);
+        callLogic.setDirOfTrv(CentralLogicClass.Req_Dir.DontCare);
+    }
     //Conditions from STOPPED_OPEN_DOOR
     private boolean dc1() {
         // Close door when:
@@ -261,7 +320,7 @@ public class ElevatorSAClass {
         //OR
         // - no call exists and 12 seconds waited and no ES
 
-        if ((getDoorTimerLevel() >= 6000 && centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 6000 && opcuaInput.getCloseDoor() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 12000 && centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()))
+        if ((getDoorTimerLevel() >= 6 && centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 6 && opcuaInput.getCloseDoor() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 12 && !centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()))
         {
             stopDoorTimer();
             return true;
@@ -275,7 +334,7 @@ public class ElevatorSAClass {
     {
         //one sec after approach sensor triggort (0,5m) left
         //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
-        if (centralLogic.getApproachTimerUPMillisSeconds() >= 1000 && modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel())
+        if (centralLogic.getApproachTimerUPMillisSeconds() >= 1 && modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel())
         {
             centralLogic.setApproachTimerUp(false);
             return true;
@@ -286,13 +345,19 @@ public class ElevatorSAClass {
 
     private boolean U3()
     {
+        //look a dirofTrav
         //and level approach sensor == level form destination
         //and
         //saftey sensor - no matter which one -> physical space of elevator important
-        if((modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySaftyStop())
-            return true;
-        else
-            return false;
+        if(callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up){
+            if((modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySaftyStop())
+                return true;
+        }
+        if(callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Down){
+            if((modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySaftyStop())
+                return true;
+        }
+        return false;
     }
 
     //v2 down state transitions
@@ -300,7 +365,7 @@ public class ElevatorSAClass {
     {
         //one sec after approach sensor triggort (0,5m) left
         //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
-        if (centralLogic.getApproachTimerDOWNMillisSeconds() >= 1000 && modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel())
+        if (centralLogic.getApproachTimerDOWNMillisSeconds() >= 1 && modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel())
         {
             centralLogic.setApproachTimerDOWN(false);
             return true;
@@ -312,7 +377,7 @@ public class ElevatorSAClass {
     //crawl
     private boolean finish()
     {
-        if(centralLogic.checkReachedTimer() && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[24]))
+        if(centralLogic.checkReachedTimer() && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[25]))
             return true;
         else
             return false;
@@ -330,7 +395,7 @@ public class ElevatorSAClass {
     //doors
     private boolean do2()
     {
-        if(opcuaInput.getOpenDoor())
+        if(centralLogic.getStatusInputs()[0])
         {
             startDoorTimer();
             return true;
@@ -341,15 +406,18 @@ public class ElevatorSAClass {
 
     private boolean dc2()
     {
-        if(opcuaInput.getCloseDoor())
+        if(centralLogic.getStatusInputs()[1])
             return true;
         else
             return false;
     }
 
+    //des noch in central machen
     //spezial funktions
     //herer only used thread for timer
     public void startDoorTimer() {
+        stopDoorTimer();
+        timerDoorLevel = 0;
         schedulerDoor = Executors.newSingleThreadScheduledExecutor();
 
         schedulerDoor.scheduleAtFixedRate(() -> {

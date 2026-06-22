@@ -160,7 +160,15 @@ public class ModbusClass {
     }
 
     public int getLastUpperApproachSensorLevel() {
-        return lastLowerApproachSensorLevel;
+        return lastUpperApproachSensorLevel;
+    }
+
+    public void setLastLowerApproachSensorLevel(int level) {
+        this.lastLowerApproachSensorLevel = level;
+    }
+
+    public void setLastUpperApproachSensorLevel(int level) {
+        this.lastUpperApproachSensorLevel = level;
     }
 
 

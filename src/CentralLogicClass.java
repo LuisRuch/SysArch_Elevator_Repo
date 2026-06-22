@@ -98,8 +98,10 @@ public class CentralLogicClass {
             mode = Mode.IDLE;
         }
 
+        //only in second loop because calc is polled first, then transition is made
+        //if in second loop made no transition to other state (still in stopped - then no calls - idleor on call)
         //wird erst im 2 durchlauf akuellisiert- wenn wirklich schon los ist. damit kann man sehen ob die request im gleiche floor ist und dann wird die tür geöffnet
-        if(elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED ||  elevatorSA.getCurrentState() != ElevatorSAClass.State.OPENING_DOOR ||  elevatorSA.getCurrentState() != ElevatorSAClass.State.CLOSING_DOOR)
+        if(elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED &&  elevatorSA.getCurrentState() != ElevatorSAClass.State.OPENING_DOOR &&  elevatorSA.getCurrentState() != ElevatorSAClass.State.CLOSING_DOOR)
         {
             mode = Mode.OnCall;
         }
@@ -255,6 +257,21 @@ public class CentralLogicClass {
 
 
     //Getter und Setter
+    public void setApproachTimerStartUP(long value) {
+        approachTimerStartUP = value;
+    }
+
+    public void setApproachTimerStartDOWN(long value) {
+        approachTimerStartDOWN = value;
+    }
+
+    public void setReachedTimerRunning(boolean running) {
+        reachedTimerRunning = running;
+    }
+
+    public void setReachedTimerStart(long value) {
+        reachedTimerStart = value;
+    }
 
     public long getApproachTimerUPMillisSeconds() {
         if (!approachTimerUPRunning) {
@@ -330,6 +347,11 @@ public class CentralLogicClass {
     public Mode getMode() {
         return mode;
     }
+
+    public void setMode(Mode modeInsert) {
+        mode = modeInsert;
+    }
+
     public void setLevelInputs(boolean[] levelInputs) {
         this.levelInputs = levelInputs;
     }
