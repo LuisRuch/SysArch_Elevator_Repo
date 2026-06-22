@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ElevatorSAClass {
 
-    private State currentState = State.STOPPED_CLOSED_DOOR;
-    private State lastState = State.STOPPED_CLOSED_DOOR;
+    private State currentState = State.STOPPED;
+    private State lastState = State.STOPPED;
 
     private ScheduledExecutorService schedulerDoor;
     private volatile int timerDoorLevel = 0;
@@ -25,8 +25,9 @@ public class ElevatorSAClass {
     }
 
     public enum State {
-        STOPPED_CLOSED_DOOR,
-        STOPPED_OPEN_DOOR,
+        STOPPED,
+        OPENING_DOOR,
+        CLOSING_DOOR,
         V1_UP,
         V2_UP,
         V1_DOWN,
@@ -39,14 +40,18 @@ public class ElevatorSAClass {
 
         switch (currentState) {
 
-            case STOPPED_CLOSED_DOOR -> {
-                if (door1()) {
-                    changeState(State.STOPPED_OPEN_DOOR);
-                }
+            case STOPPED -> {
+
                 //if in level and reach sensor then rest stop[] at that level
-                else if(centralLogic.getStops()[callLogic.getCurrentLevel()] && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[24]))
+                if(centralLogic.getStops()[callLogic.getCurrentLevel()] && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[24]))
                     centralLogic.setStops(callLogic.getCurrentLevel(),false);
 
+                if (do1()) {
+                    changeState(State.OPENING_DOOR);
+                }
+                else if(dc1()){
+                    changeState(State.CLOSING_DOOR);
+                }
                 else if (AESU()) {
                     changeState(State.V1_UP);
                 }
@@ -66,15 +71,21 @@ public class ElevatorSAClass {
 
             }
 
-            case STOPPED_OPEN_DOOR -> {
-                if (door2()) {
-                    changeState(State.STOPPED_CLOSED_DOOR);
+            case OPENING_DOOR -> {
+                if (do2()) {
+                    changeState(State.STOPPED);
+                }
+            }
+
+            case CLOSING_DOOR -> {
+                if (dc2()) {
+                    changeState(State.STOPPED);
                 }
             }
 
             case V2_UP -> {
                 if (ES()) {
-                    changeState(State.STOPPED_CLOSED_DOOR);
+                    changeState(State.STOPPED);
                 }
                 else if (U2()) {
                     changeState(State.V1_UP);
@@ -84,7 +95,7 @@ public class ElevatorSAClass {
             //same transitions
             case V1_UP, V1_DOWN -> {
                 if (ES()) {
-                    changeState(State.STOPPED_CLOSED_DOOR);
+                    changeState(State.STOPPED);
                 }
                 else if (U3()) {
                     changeState(State.CRAWL);
@@ -93,7 +104,7 @@ public class ElevatorSAClass {
 
             case V2_DOWN -> {
                 if (ES()) {
-                    changeState(State.STOPPED_CLOSED_DOOR);
+                    changeState(State.STOPPED);
                 }
                 else if (D2()) {
                     changeState(State.V1_DOWN);
@@ -103,7 +114,7 @@ public class ElevatorSAClass {
             case CRAWL -> {
 
                 if (ES() || finish()) {
-                    changeState(State.STOPPED_CLOSED_DOOR);
+                    changeState(State.STOPPED);
                 }
             }
         }
@@ -123,14 +134,18 @@ public class ElevatorSAClass {
 
         //on entry of state the follwoing actions will be caried out
         switch (newState) {
-            case STOPPED_CLOSED_DOOR:
+            case STOPPED:
                 modbus.stopMotor();
                 modbus.stopDoor();
                 break;
 
-            case STOPPED_OPEN_DOOR:
-                modbus.stopDoor();
-                startDoorTimer();
+            case OPENING_DOOR:
+                modbus.startOpenDoor();
+
+                break;
+
+            case CLOSING_DOOR:
+                modbus.startCloseDoor();
                 break;
 
             case V1_UP:
@@ -169,7 +184,7 @@ public class ElevatorSAClass {
 
 
     //Conditions from STOPPED_CLOSED_DOOR
-    private boolean door1() {
+    private boolean do1() {
         //Automatic open door, if elevator arrived at destination - no Emergency Stop  && last State was crawl
         //or
         //open door if no call and button clicked to open door
@@ -238,7 +253,7 @@ public class ElevatorSAClass {
 
 
     //Conditions from STOPPED_OPEN_DOOR
-    private boolean door2() {
+    private boolean dc1() {
         // Close door when:
         // - call exists and 6 seconds waited and no ES
         // OR
@@ -312,6 +327,25 @@ public class ElevatorSAClass {
             return false;
     }
 
+    //doors
+    private boolean do2()
+    {
+        if(opcuaInput.getOpenDoor())
+        {
+            startDoorTimer();
+            return true;
+        }
+        else
+            return false;
+    }
+
+    private boolean dc2()
+    {
+        if(opcuaInput.getCloseDoor())
+            return true;
+        else
+            return false;
+    }
 
     //spezial funktions
     //herer only used thread for timer
