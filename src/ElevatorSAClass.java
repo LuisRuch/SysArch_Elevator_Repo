@@ -7,6 +7,7 @@ public class ElevatorSAClass {
 
     private State currentState = State.STOPPED;
     private State lastState = State.STOPPED;
+    private boolean wasreached = false;
 
     private ScheduledExecutorService schedulerDoor;
     private volatile int timerDoorLevel = 0;
@@ -131,10 +132,33 @@ public class ElevatorSAClass {
 
             case CRAWL -> {
 
+                if(!centralLogic.getReachedSensorActive())
+                {
+                    if(!wasreached)
+                    {
+                        if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up)
+                            modbus.startCrawl(2);
+                        else
+                            modbus.startCrawl(-2);
+                    }
+                    else
+                    {
+                        if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up)
+                            modbus.startCrawl(-1);
+                        else
+                            modbus.startCrawl(1);
+                    }
+                }
+
+                if(centralLogic.getReachedSensorActive())
+                    wasreached = true;
+
+                //Transitions
                 if (ES()) {
                     changeState(State.STOPPED);
                 }
                 else if (finish()){
+                    wasreached = false;
                     callLogic.setCurrentLevel(callLogic.getNextLevel());
                     changeState(State.STOPPED);
                 }
@@ -190,9 +214,9 @@ public class ElevatorSAClass {
                 modbus.startMotorDownV2();
                 break;
 
+            //no use
             case CRAWL:
 
-                crawlapproach();
                 break;
         }
 
@@ -201,7 +225,7 @@ public class ElevatorSAClass {
 
 
 
-
+    //no use
     private void crawlapproach() {
         //hier einmal thread aufrufen. der sich annährt
     }

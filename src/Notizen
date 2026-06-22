@@ -1,6 +1,5 @@
 //BACKLOG
 //Must
-Crawl-Mode - thread which fine tunes approach
 CallLogic - Chatty
 Skipp CallLogic when in v1 already
 Supervisory Mode - no automatic calls

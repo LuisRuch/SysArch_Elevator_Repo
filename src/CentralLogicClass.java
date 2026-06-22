@@ -205,34 +205,9 @@ public class CentralLogicClass {
     }
 
     public boolean checkReachedTimer() {
-        if (levelInputs == null) {
-            return false;
-        }
-
-        boolean reachedSensorActive = false;
-
-        // nextLevel 1: Reached Sensor L1 = index 1
-        if (callLogic.getNextLevel() == 1) {
-            reachedSensorActive = levelInputs[1];
-        }
-
-        // nextLevel 2: Reached Sensor L2 = index 9
-        else if (callLogic.getNextLevel() == 2) {
-            reachedSensorActive = levelInputs[9];
-        }
-
-        // nextLevel 3: Reached Sensor L3 = index 17
-        else if (callLogic.getNextLevel() == 3) {
-            reachedSensorActive = levelInputs[17];
-        }
-
-        // nextLevel 4: Reached Sensor L4 = index 25
-        else if (callLogic.getNextLevel() == 4) {
-            reachedSensorActive = levelInputs[25];
-        }
 
         // Timer starten, wenn Reached Sensor aktiv ist
-        if (!reachedTimerRunning && reachedSensorActive) {
+        if (!reachedTimerRunning && getReachedSensorActive()) {
             reachedTimerRunning = true;
             reachedTimerStart = System.currentTimeMillis();
         }
@@ -298,10 +273,15 @@ public class CentralLogicClass {
     }
 
 
+    public boolean getReachedSensorActive() {
+
+        return  levelInputs[1]  // Reached Sensor L1
+                || levelInputs[9]   // Reached Sensor L2
+                || levelInputs[17]  // Reached Sensor L3
+                ||  levelInputs[25]; // Reached Sensor L4
+    }
+
     public boolean getAnySafetyStop() {
-        if (levelInputs == null) {
-            return false;
-        }
 
         return levelInputs[0]   // L1 SL
                 || levelInputs[2]   // L1 SU
