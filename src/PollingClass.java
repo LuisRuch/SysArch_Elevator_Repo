@@ -49,7 +49,7 @@ public class PollingClass {
             while (runningRest) {
                 try {
                     opcuaInput.handleInputs();
-                    if(opcuaInput.getSupervisor())
+                    if(!opcuaInput.getSupervisor())
                     {
                         //if v1u/d or crawl or stopped aber kein reached -> skip updateNextLevel
                         if (elevatorSA.getCurrentState() != ElevatorSAClass.State.V1_UP
