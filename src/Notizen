@@ -1,27 +1,29 @@
-was passiert wenn Supervisor. muss dannach rest. wie weiß automat wo er ist
--> sonst kann er bestimmt abstützen
-supervisor wird straight aufgeruffen
+//BACKLOG
+//Must
+Crawl-Mode - thread which fine tunes approach
+CallLogic - Chatty
+Skipp CallLogic when in v1 already
+Supervisory Mode - no automatic calls
+Supervisory Mode switch to normal (drive to Position manually / find current position mode)
 
 
-Der Motor wird immer kurz komplett gestopped wenn neues signal. mal schauen ob man das sieht
+//Should
+move all Logic to CentralLogicClass (Modbus and ElevatorSA)
+Modbus and Rest Thread in one thread
+Own CallLogic
 
 
-sauber des mit dem exeptions machen
-
-Does call logic work
-
-kann modbus von zwei threads verwendet werden einer list einer schreibt. ghet auch in einem theoretisch
-
-//aufgaben
-crawl machen
-update next level soll in v1 und crawl nicht aufgerufen werden. oder wenn im emergency stop - aber achtung emergency stop kann gelöst werden und dann kann wird nues next level obwohl er dann wieder in crawl geht weil er da abgebrochen wurden ist.
-sachen in central logic. statt eg. modbus/elvator ea
+//Can
+Do we need Stops[] and Req-Dir ??
 unnötige get set löschen
 Null prüfung
+sauber des mit dem exeptions machen
+
+
+
+
 
 //behavior
 wenn tür zu ist, dann fährt elevator direkt los. man kann nicht nochmal auf machen
+Der Motor wird immer kurz komplett gestopped wenn neues signal. mal schauen ob man das sieht
 
-test form github
-
-test test

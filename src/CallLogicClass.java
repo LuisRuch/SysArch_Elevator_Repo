@@ -1,4 +1,5 @@
-public class CallLogicClass {
+public class CallLogicClass
+{
 
 
     // This class will set the nextLevel - therefore the elevator will know where to go
@@ -21,66 +22,134 @@ public class CallLogicClass {
 
     //hier noch restrection, dass wenn in zustand v1 dass dannn nicht mehr ge#ndert werden kann
     public void UpdateNextLevel() {
+
+        while(a)
+        if(search(dir of trave up, such nach oben))
+            break;
+        if(a)
+        search(dir of trave up, such nach unten)
         if (DirOfTrv == CentralLogicClass.Req_Dir.Up) {
             for (int i = currentLevel; i <= maxLevel; i++) {
 
                 if (stops[i]) {
 
-                    if ((i != maxLevel && i != minLevel) &&
-                            (DirOfTrv == Req_Dir_Array[i])) {
-
-                        nextLevel = i;
-                        difference = nextLevel - currentLevel;
-                        return;
-                    } else {
+                    if ((i != maxLevel && i != minLevel) && (stops[i]||
+                            (DirOfTrv == Req_Dir_Array[i]))) {
                         nextLevel = i;
                         difference = nextLevel - currentLevel;
                         return;
                     }
                 }
             }
+
+            if (stops[maxLevel] == true) {
+                nextLevel = maxLevel;
+                difference = nextLevel - currentLevel;
+                return;
+            }
         }
 
-        else if (DirOfTrv == CentralLogicClass.Req_Dir.Down) {
+        else if (DirOfTrv == CentralLogicClass.Req_Dir.Down)
+        {
             for (int i = currentLevel; i >= minLevel; i--) {
 
                 if (stops[i]) {
 
-                    if ((i != maxLevel && i != minLevel) &&
-                            (DirOfTrv == Req_Dir_Array[i])) {
+                    if ((i != maxLevel && i != minLevel) && (stops[i]||
+                            (DirOfTrv == Req_Dir_Array[i]))) {
 
-                        nextLevel = i;
-                        difference = nextLevel - currentLevel;
-                        return;
-                    } else {
                         nextLevel = i;
                         difference = nextLevel - currentLevel;
                         return;
                     }
                 }
             }
+
+            if (stops[minLevel] == true) {
+                nextLevel = minLevel;
+                difference = nextLevel - currentLevel;
+                return;
+            }
         }
 
-        else {
-            for (int i = minLevel; i <= maxLevel; i++) {
+
+        if(DirOfTrv == CentralLogicClass.Req_Dir.Down){
+            DirOfTrv = CentralLogicClass.Req_Dir.Up;
+        }
+        else
+            DirOfTrv = CentralLogicClass.Req_Dir.Down;
+
+        if (DirOfTrv == CentralLogicClass.Req_Dir.Up) {
+            for (int i = currentLevel; i <= maxLevel; i++) {
 
                 if (stops[i]) {
-                    nextLevel = i;
 
-                    if (i > currentLevel) {
-                        DirOfTrv = CentralLogicClass.Req_Dir.Up;
-                    } else if (i < currentLevel) {
-                        DirOfTrv = CentralLogicClass.Req_Dir.Down;
-                    } else {
-                        DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
+                    if ((i != maxLevel && i != minLevel) && (stops[i]||
+                            (DirOfTrv == Req_Dir_Array[i]))) {
+                        nextLevel = i;
+                        difference = nextLevel - currentLevel;
+                        return;
                     }
-
-                    difference = nextLevel - currentLevel;
-                    return;
                 }
             }
+
+            if (stops[maxLevel] == true) {
+                nextLevel = maxLevel;
+                difference = nextLevel - currentLevel;
+                return;
+            }
         }
-        difference = nextLevel - currentLevel;
+
+        else if (DirOfTrv == CentralLogicClass.Req_Dir.Down)
+        {
+            for (int i = currentLevel; i >= minLevel; i--) {
+
+                if (stops[i]) {
+
+                    if ((i != maxLevel && i != minLevel) && (stops[i]||
+                            (DirOfTrv == Req_Dir_Array[i]))) {
+
+                        nextLevel = i;
+                        difference = nextLevel - currentLevel;
+                        return;
+                    }
+                }
+            }
+
+            if (stops[minLevel] == true) {
+                nextLevel = minLevel;
+                difference = nextLevel - currentLevel;
+                return;
+            }
+        }
+
+        DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
+        difference = 0;
+        return;
+
+//        else
+//        {
+//            for (int i = minLevel; i <= maxLevel; i++) {
+//
+//                if (stops[i]) {
+//                    nextLevel = i;
+//
+//                    if (i > currentLevel) {
+//                        DirOfTrv = CentralLogicClass.Req_Dir.Up;
+//                    } else if (i < currentLevel) {
+//                        DirOfTrv = CentralLogicClass.Req_Dir.Down;
+//                    } else {
+//                        DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
+//                    }
+//
+//                    difference = nextLevel - currentLevel;
+//                    return;
+//                }
+//            }
+//        }
+//
+//        difference = nextLevel - currentLevel;
+
     }
 
     public int getdiffernce()

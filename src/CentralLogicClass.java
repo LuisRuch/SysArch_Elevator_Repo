@@ -298,7 +298,7 @@ public class CentralLogicClass {
     }
 
 
-    public boolean getAnySaftyStop() {
+    public boolean getAnySafetyStop() {
         if (levelInputs == null) {
             return false;
         }

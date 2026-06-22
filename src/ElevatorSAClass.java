@@ -61,8 +61,10 @@ public class ElevatorSAClass {
 
                 //has to be if
                 //if in level and reach sensor then rest stop[] at that level
-                if(centralLogic.getStops()[callLogic.getCurrentLevel()] && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[25]))
-                    centralLogic.setStops(callLogic.getCurrentLevel(),false);
+                if(centralLogic.getStops()[callLogic.getCurrentLevel()] && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[25])) {
+                    centralLogic.setStops(callLogic.getCurrentLevel(), false);
+                    centralLogic.setReq_Dir_Array(callLogic.getCurrentLevel(), null);
+                }
 
                 //here if else can start
                 if(dc1() && centralLogic.getStatusInputs()[0]){
@@ -350,11 +352,11 @@ public class ElevatorSAClass {
         //and
         //saftey sensor - no matter which one -> physical space of elevator important
         if(callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up){
-            if((modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySaftyStop())
+            if((modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySafetyStop())
                 return true;
         }
         if(callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Down){
-            if((modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySaftyStop())
+            if((modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySafetyStop())
                 return true;
         }
         return false;
