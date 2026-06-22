@@ -77,7 +77,7 @@ public class CentralLogicClass {
         this.modbus = modbus;
 
         callLogic = new CallLogicClass(stops,Req_Dir_Array,this);
-        opcuaInput = new OPCUAInputClass(this);
+        opcuaInput = new OPCUAInputClass(this,modbus);
         elevatorSA = new ElevatorSAClass(this,opcuaInput,modbus,callLogic);
         polling = new PollingClass(this,callLogic,opcuaInput,elevatorSA, modbus);
 

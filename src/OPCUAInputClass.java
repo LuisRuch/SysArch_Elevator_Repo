@@ -25,12 +25,21 @@ public class OPCUAInputClass {
     private int specialCrawl = 0;
     private boolean reset = false;
 
+    //"memory"
+    private boolean speedV1UpHandled = false;
+    private boolean speedV1DownHandled = false;
+    private boolean speedV2UpHandled = false;
+    private boolean speedV2DownHandled = false;
+    private boolean crawlHandled = false;
+    private boolean resetHandled = false;
 
     CentralLogicClass centralLogic;
+    ModbusClass modbus;
 
     //Constructor
-    public OPCUAInputClass(CentralLogicClass centralLogic) {
+    public OPCUAInputClass(CentralLogicClass centralLogic, ModbusClass modbus) {
         this.centralLogic = centralLogic;
+        this.modbus = modbus;
     }
 
 
@@ -91,6 +100,63 @@ public class OPCUAInputClass {
             centralLogic.setReq_Dir_Array(4, CentralLogicClass.Req_Dir.Down);
             outsideLevel4Down = false;
         }
+
+        //supervisor functions
+        if (reset) {
+            modbus.resetSimulation();
+            reset = false;
+        }
+
+
+        if (speedV1Up && !speedV1UpHandled) {
+            modbus.startMotorUpV1();
+            speedV1UpHandled = true;
+        }
+
+        if (!speedV1Up) {
+            speedV1UpHandled = false;
+        }
+
+
+        if (speedV1Down && !speedV1DownHandled) {
+            modbus.startMotorDownV1();
+            speedV1DownHandled = true;
+        }
+
+        if (!speedV1Down) {
+            speedV1DownHandled = false;
+        }
+
+
+        if (speedV2Up && !speedV2UpHandled) {
+            modbus.startMotorUpV2();
+            speedV2UpHandled = true;
+        }
+
+        if (!speedV2Up) {
+            speedV2UpHandled = false;
+        }
+
+
+        if (speedV2Down && !speedV2DownHandled) {
+            modbus.startMotorDownV2();
+            speedV2DownHandled = true;
+        }
+
+        if (!speedV2Down) {
+            speedV2DownHandled = false;
+        }
+
+
+        if (specialCrawl != 0 && !crawlHandled) {
+            modbus.startCrawl(specialCrawl);
+            crawlHandled = true;
+        }
+
+        if (specialCrawl == 0) {
+            crawlHandled = false;
+        }
+
     }
 
 

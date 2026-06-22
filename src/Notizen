@@ -1,7 +1,10 @@
 was passiert wenn Supervisor. muss dannach rest. wie weiß automat wo er ist
 -> sonst kann er bestimmt abstützen
+supervisor wird straight aufgeruffen
+
 
 Der Motor wird immer kurz komplett gestopped wenn neues signal. mal schauen ob man das sieht
+
 
 sauber des mit dem exeptions machen
 
@@ -9,9 +12,10 @@ Does call logic work
 
 
 //aufgaben
-Rest
-Supervisor
-sachen in central logic. statt eg. modbus
+Rest - bei State automat
+sachen in central logic. statt eg. modbus/elvator ea
+unnötige get set löschen
+Null prüfung
 
 //behavior
 wenn tür zu ist, dann fährt elevator direkt los. man kann nicht nochmal auf machen
