@@ -24,6 +24,7 @@ public class OPCUAInputClass {
     private boolean speedV2Down = false;
     private int specialCrawl = 0;
     private boolean reset = false;
+    private boolean supervisor = false;
 
 
     CentralLogicClass centralLogic;
@@ -167,6 +168,10 @@ public class OPCUAInputClass {
 
     public boolean getReset(){
         return reset;
+    }
+
+    public boolean getSupervisor() {
+        return supervisor;
     }
 
 

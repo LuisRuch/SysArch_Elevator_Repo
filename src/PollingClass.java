@@ -49,9 +49,12 @@ public class PollingClass {
             while (runningRest) {
                 try {
                     opcuaInput.handleInputs();
-                    callLogic.UpdateNextLevel();
-                    centralLogic.calcfunctions();
-                    elevatorSA.handleStateTransitions();
+                    if(opcuaInput.getSupervisor())
+                    {
+                        callLogic.UpdateNextLevel();
+                        centralLogic.calcfunctions();
+                        elevatorSA.handleStateTransitions();
+                    }
                     Thread.sleep(200);
                 } catch (Exception e) {
                     System.err.println("Rest reading error: " + e.getMessage());
