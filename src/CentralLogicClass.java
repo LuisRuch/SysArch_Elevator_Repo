@@ -99,7 +99,7 @@ public class CentralLogicClass {
         }
 
         //wird erst im 2 durchlauf akuellisiert- wenn wirklich schon los ist. damit kann man sehen ob die request im gleiche floor ist und dann wird die tür geöffnet
-        if(elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED_CLOSED_DOOR ||  elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED_OPEN_DOOR)
+        if(elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED ||  elevatorSA.getCurrentState() != ElevatorSAClass.State.OPENING_DOOR ||  elevatorSA.getCurrentState() != ElevatorSAClass.State.CLOSING_DOOR)
         {
             mode = Mode.OnCall;
         }
