@@ -58,12 +58,26 @@ public class ElevatorSAClass {
                 //has to be before erasing stops / has to be if
                 if (do1() && centralLogic.getStatusInputs()[1]) {
                     changeState(State.OPENING_DOOR);
+                    return;
                 }
 
                 //has to be if
                 //if in level and reach sensor then rest stop[] at that level
-                if(centralLogic.getStops()[callLogic.getCurrentLevel()] && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[25])) {
+                if(centralLogic.getStops()[callLogic.getCurrentLevel()] && (centralLogic.getLevelInputs()[1] || centralLogic.getLevelInputs()[9] || centralLogic.getLevelInputs()[17]  || centralLogic.getLevelInputs()[25]))
+                {
                     centralLogic.setStops(callLogic.getCurrentLevel(), false);
+                    switch(callLogic.getCurrentLevel())
+                    {
+                        case 1 -> centralLogic.setReq_Dir_Array(0, null);
+                        case 2 -> {centralLogic.setReq_Dir_Array(1, null);
+                                    centralLogic.setReq_Dir_Array(2, null);}
+                        case 3 -> {centralLogic.setReq_Dir_Array(3, null);
+                            centralLogic.setReq_Dir_Array(2, null);}
+                        case 4 -> centralLogic.setReq_Dir_Array(4, null);
+                    }
+
+
+                    centralLogic.setReq_Dir_Array(callLogic.getCurrentLevel(), null);
                     centralLogic.setReq_Dir_Array(callLogic.getCurrentLevel(), null);
                 }
 
@@ -240,7 +254,7 @@ public class ElevatorSAClass {
 
         //if had no calls(IDLE) and (new)request in same level as current elevator
 
-        if((!opcuaInput.getEmergencyStop() && lastState == State.CRAWL)  || (centralLogic.getMode() == CentralLogicClass.Mode.IDLE && centralLogic.getStops()[callLogic.getCurrentLevel()] && !opcuaInput.getEmergencyStop()))
+        if((!opcuaInput.getEmergencyStop() && lastState == State.CRAWL && centralLogic.getReachedSensorActive())  || (centralLogic.getMode() == CentralLogicClass.Mode.IDLE && centralLogic.getStops()[callLogic.getCurrentLevel()] && !opcuaInput.getEmergencyStop()))
             return true;
 
         else

@@ -310,6 +310,7 @@ public class CallLogicClass
 
     private final boolean[] stops;
     private final CentralLogicClass.Req_Dir[] Req_Dir_Array;
+    CentralLogicClass logic;
 
     public CallLogicClass(boolean[] stops,
                           CentralLogicClass.Req_Dir[] Req_Dir_Array,
@@ -317,6 +318,7 @@ public class CallLogicClass
     {
         this.stops = stops;
         this.Req_Dir_Array = Req_Dir_Array;
+        this.logic = logic;
     }
 
     /*
@@ -328,6 +330,30 @@ public class CallLogicClass
      * true  -> cabin calls / DontCare / hall calls in travel direction
      * false -> hall calls against the current travel direction
      */
+    private CentralLogicClass.Req_Dir getDownRequest(int level)
+    {
+        return switch (level)
+        {
+            case 2 -> Req_Dir_Array[1];
+            case 3 -> Req_Dir_Array[3];
+            case 4 -> Req_Dir_Array[5];
+            default -> null; // Stockwerk 1 hat keinen Down-Taster
+        };
+    }
+
+    private CentralLogicClass.Req_Dir getUpRequest(int level)
+    {
+        return switch (level)
+        {
+            case 1 -> Req_Dir_Array[0];
+            case 2 -> Req_Dir_Array[2];
+            case 3 -> Req_Dir_Array[4];
+            default -> null; // Stockwerk 4 hat keinen Up-Taster
+        };
+    }
+
+
+
     private boolean findNextLevel(boolean searchUp, boolean sameDirection)
     {
         int step = searchUp ? 1 : -1;
@@ -350,10 +376,19 @@ public class CallLogicClass
             CentralLogicClass.Req_Dir requestedDirection = Req_Dir_Array[i];
 
             // null and DontCare are cabin calls / calls without a direction.
+            CentralLogicClass.Req_Dir upRequest = getUpRequest(i);
+            CentralLogicClass.Req_Dir downRequest = getDownRequest(i);
+
+            boolean hasDontCareRequest =
+                    upRequest == CentralLogicClass.Req_Dir.DontCare
+                            || downRequest == CentralLogicClass.Req_Dir.DontCare;
+
             boolean requestMatchesTravelDirection =
-                    requestedDirection == null
-                            || requestedDirection == CentralLogicClass.Req_Dir.DontCare
-                            || requestedDirection == DirOfTrv;
+                    hasDontCareRequest
+                            || (DirOfTrv == CentralLogicClass.Req_Dir.Up
+                            && upRequest == CentralLogicClass.Req_Dir.Up)
+                            || (DirOfTrv == CentralLogicClass.Req_Dir.Down
+                            && downRequest == CentralLogicClass.Req_Dir.Down);
 
             if (sameDirection != requestMatchesTravelDirection)
                 continue;
@@ -386,69 +421,69 @@ public class CallLogicClass
         DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
     }
 
-//    private boolean hasStopAbove()
-//    {
-//        for (int i = currentLevel + 1; i <= maxLevel; i++)
-//        {
-//            if (stops[i])
-//                return true;
-//        }
-//        return false;
-//    }
-//
-//    private boolean hasStopBelow()
-//    {
-//        for (int i = currentLevel - 1; i >= minLevel; i--)
-//        {
-//            if (stops[i])
-//                return true;
-//        }
-//        return false;
-//    }
+    private boolean hasStopAbove()
+    {
+        for (int i = currentLevel + 1; i <= maxLevel; i++)
+        {
+            if (stops[i])
+                return true;
+        }
+        return false;
+    }
 
-//    private int distanceToNextStopAbove()
-//    {
-//        for (int i = currentLevel + 1; i <= maxLevel; i++)
-//        {
-//            if (stops[i])
-//                return i - currentLevel;
-//        }
-//        return Integer.MAX_VALUE;
-//    }
-//
-//    private int distanceToNextStopBelow()
-//    {
-//        for (int i = currentLevel - 1; i >= minLevel; i--)
-//        {
-//            if (stops[i])
-//                return currentLevel - i;
-//        }
-//        return Integer.MAX_VALUE;
-//    }
-//
-//    private void chooseInitialDirection()
-//    {
-//        boolean stopAbove = hasStopAbove();
-//        boolean stopBelow = hasStopBelow();
-//
-//        if (stopAbove && !stopBelow)
-//        {
-//            DirOfTrv = CentralLogicClass.Req_Dir.Up;
-//        }
-//        else if (!stopAbove && stopBelow)
-//        {
-//            DirOfTrv = CentralLogicClass.Req_Dir.Down;
-//        }
-//        else if (stopAbove && stopBelow)
-//        {
-//            // If calls exist on both sides, take the closer side first.
-//            // In a tie, keep the old behaviour and prefer Up.
-//            if (distanceToNextStopAbove() <= distanceToNextStopBelow())
-//                DirOfTrv = CentralLogicClass.Req_Dir.Up;
-//            else
-//                DirOfTrv = CentralLogicClass.Req_Dir.Down;
-//        }
-//    }
+    private boolean hasStopBelow()
+    {
+        for (int i = currentLevel - 1; i >= minLevel; i--)
+        {
+            if (stops[i])
+                return true;
+        }
+        return false;
+    }
+
+    private int distanceToNextStopAbove()
+    {
+        for (int i = currentLevel + 1; i <= maxLevel; i++)
+        {
+            if (stops[i])
+                return i - currentLevel;
+        }
+        return Integer.MAX_VALUE;
+    }
+
+    private int distanceToNextStopBelow()
+    {
+        for (int i = currentLevel - 1; i >= minLevel; i--)
+        {
+            if (stops[i])
+                return currentLevel - i;
+        }
+        return Integer.MAX_VALUE;
+    }
+
+    private void chooseInitialDirection()
+    {
+        boolean stopAbove = hasStopAbove();
+        boolean stopBelow = hasStopBelow();
+
+        if (stopAbove && !stopBelow)
+        {
+            DirOfTrv = CentralLogicClass.Req_Dir.Up;
+        }
+        else if (!stopAbove && stopBelow)
+        {
+            DirOfTrv = CentralLogicClass.Req_Dir.Down;
+        }
+        else if (stopAbove && stopBelow)
+        {
+            // If calls exist on both sides, take the closer side first.
+            // In a tie, keep the old behaviour and prefer Up.
+            if (distanceToNextStopAbove() <= distanceToNextStopBelow())
+                DirOfTrv = CentralLogicClass.Req_Dir.Up;
+            else
+                DirOfTrv = CentralLogicClass.Req_Dir.Down;
+        }
+    }
 
     private void switchDirection()
     {
@@ -460,6 +495,18 @@ public class CallLogicClass
 
     public void UpdateNextLevel()
     {
+        //new next level
+        if(logic.getReachedSensorActive())
+        {
+            if(logic.getStatusInputs()[1])
+                nextLevel=1;
+            if(logic.getStatusInputs()[9])
+                nextLevel= 2;
+            if(logic.getStatusInputs()[17])
+                nextLevel= 3;
+            if(logic.getStatusInputs()[25])
+                nextLevel= 4;
+        }
         /*
          * A request on the current floor may only be selected when no trip is
          * currently active. During a trip, currentLevel is still the last
@@ -473,14 +520,14 @@ public class CallLogicClass
 
         if (DirOfTrv == CentralLogicClass.Req_Dir.DontCare)
             DirOfTrv = CentralLogicClass.Req_Dir.Up;
-        //chooseInitialDirection();
+            //chooseInitialDirection();
 
         // No calls above or below and no usable call on the current floor.
-        if (DirOfTrv == CentralLogicClass.Req_Dir.DontCare)
-        {
-            clearDestination();
-            return;
-        }
+//        if (DirOfTrv == CentralLogicClass.Req_Dir.DontCare)
+//        {
+//            clearDestination();
+//            return;
+//        }
 
         // 1. Search in the current travel direction for matching calls.
         if (DirOfTrv == CentralLogicClass.Req_Dir.Up)

@@ -41,30 +41,34 @@ public class OPCUAInputClass {
     public void handleInputs() throws Exception {
         if (insideLevel1) {
             centralLogic.setStops(1, true);
+            centralLogic.setReq_Dir_Array(0, CentralLogicClass.Req_Dir.DontCare);
             insideLevel1 = false;
         }
 
         if (insideLevel2) {
             centralLogic.setStops(2, true);
+            centralLogic.setReq_Dir_Array(1, CentralLogicClass.Req_Dir.DontCare);
+            centralLogic.setReq_Dir_Array(2, CentralLogicClass.Req_Dir.DontCare);
             insideLevel2 = false;
         }
 
         if (insideLevel3) {
             centralLogic.setStops(3, true);
+            centralLogic.setReq_Dir_Array(3, CentralLogicClass.Req_Dir.DontCare);
+            centralLogic.setReq_Dir_Array(4, CentralLogicClass.Req_Dir.DontCare);
             insideLevel3 = false;
         }
 
         if (insideLevel4) {
             centralLogic.setStops(4, true);
+            centralLogic.setReq_Dir_Array(5, CentralLogicClass.Req_Dir.DontCare);
             insideLevel4 = false;
         }
 
         if (outsideLevel1Up) {
-            if (centralLogic.getReq_Dir_Array()[1] != null) {
+            if (centralLogic.getReq_Dir_Array()[0] != null) {
                 centralLogic.setStops(1, true);
-            } else {
-                centralLogic.setStops(1, true);
-                centralLogic.setReq_Dir_Array(1, CentralLogicClass.Req_Dir.Up);
+                centralLogic.setReq_Dir_Array(1, CentralLogicClass.Req_Dir.DontCare);
             }
 
             outsideLevel1Up = false;
@@ -72,19 +76,23 @@ public class OPCUAInputClass {
 
         if (outsideLevel2Up) {
             if (centralLogic.getReq_Dir_Array()[2] != null) {
+                centralLogic.setReq_Dir_Array(1, CentralLogicClass.Req_Dir.DontCare);
+                centralLogic.setReq_Dir_Array(2, CentralLogicClass.Req_Dir.DontCare);
+            }
+            else{
                 centralLogic.setStops(2, true);
-            } else {
-                centralLogic.setStops(2, true);
-                centralLogic.setReq_Dir_Array(2, CentralLogicClass.Req_Dir.Up);
+                centralLogic.setReq_Dir_Array(1, CentralLogicClass.Req_Dir.Up);
             }
 
             outsideLevel2Up = false;
         }
 
         if (outsideLevel2Down) {
-            if (centralLogic.getReq_Dir_Array()[2] != null) {
-                centralLogic.setStops(2, true);
-            } else {
+            if (centralLogic.getReq_Dir_Array()[1] != null) {
+                centralLogic.setReq_Dir_Array(1, CentralLogicClass.Req_Dir.DontCare);
+                centralLogic.setReq_Dir_Array(2, CentralLogicClass.Req_Dir.DontCare);
+            }
+            else{
                 centralLogic.setStops(2, true);
                 centralLogic.setReq_Dir_Array(2, CentralLogicClass.Req_Dir.Down);
             }
@@ -93,9 +101,11 @@ public class OPCUAInputClass {
         }
 
         if (outsideLevel3Up) {
-            if (centralLogic.getReq_Dir_Array()[3] != null) {
-                centralLogic.setStops(3, true);
-            } else {
+            if (centralLogic.getReq_Dir_Array()[4] != null) {
+                centralLogic.setReq_Dir_Array(3, CentralLogicClass.Req_Dir.DontCare);
+                centralLogic.setReq_Dir_Array(4, CentralLogicClass.Req_Dir.DontCare);
+            }
+            else{
                 centralLogic.setStops(3, true);
                 centralLogic.setReq_Dir_Array(3, CentralLogicClass.Req_Dir.Up);
             }
@@ -105,21 +115,21 @@ public class OPCUAInputClass {
 
         if (outsideLevel3Down) {
             if (centralLogic.getReq_Dir_Array()[3] != null) {
+                centralLogic.setReq_Dir_Array(3, CentralLogicClass.Req_Dir.DontCare);
+                centralLogic.setReq_Dir_Array(4, CentralLogicClass.Req_Dir.DontCare);
+            }
+            else{
                 centralLogic.setStops(3, true);
-            } else {
-                centralLogic.setStops(3, true);
-                centralLogic.setReq_Dir_Array(3, CentralLogicClass.Req_Dir.Down);
+                centralLogic.setReq_Dir_Array(4, CentralLogicClass.Req_Dir.Down);
             }
 
             outsideLevel3Down = false;
         }
 
         if (outsideLevel4Down) {
-            if (centralLogic.getReq_Dir_Array()[4] != null) {
-                centralLogic.setStops(4, true);
-            } else {
-                centralLogic.setStops(4, true);
-                centralLogic.setReq_Dir_Array(4, CentralLogicClass.Req_Dir.Down);
+            if (centralLogic.getReq_Dir_Array()[5] != null) {
+                centralLogic.setStops(5, true);
+                centralLogic.setReq_Dir_Array(5, CentralLogicClass.Req_Dir.DontCare);
             }
 
             outsideLevel4Down = false;
