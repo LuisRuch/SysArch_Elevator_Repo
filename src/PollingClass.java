@@ -26,12 +26,7 @@ public class PollingClass {
         Thread pollingModbusThread = new Thread(() -> {
             while (runningModbus) {
                 try {
-                    modbus.readAllInputs();
-                    centralLogic.setLevelInputs(modbus.getLevelInputs());
-                    centralLogic.setStatusInputs(modbus.getStatusInputs());
-                    centralLogic.setSpecialInputs(modbus.getSpecialInputs());
-                    modbus.updateLastLowerApproachSensorFromLevelInputs();
-                    modbus.updateLastUpperApproachSensorFromLevelInputs();
+
                     Thread.sleep(200);
                 } catch (Exception e) {
                     System.err.println("Modbus reading error: " + e.getMessage());
@@ -48,6 +43,12 @@ public class PollingClass {
         Thread pollingResetThread = new Thread(() -> {
             while (runningRest) {
                 try {
+                    modbus.readAllInputs();
+                    centralLogic.setLevelInputs(modbus.getLevelInputs());
+                    centralLogic.setStatusInputs(modbus.getStatusInputs());
+                    centralLogic.setSpecialInputs(modbus.getSpecialInputs());
+                    modbus.updateLastLowerApproachSensorFromLevelInputs();
+                    modbus.updateLastUpperApproachSensorFromLevelInputs();
                     opcuaInput.handleInputs();
                     if(!opcuaInput.getSupervisor())
                     {
