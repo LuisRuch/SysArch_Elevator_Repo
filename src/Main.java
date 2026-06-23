@@ -7,12 +7,96 @@ public class Main {
         //creates ModbusClass + start Modbus
         ModbusClass modbus = new ModbusClass();
             modbus.connect();
-            Thread.sleep(200);
-            modbus.resetSimulation();
-            Thread.sleep(200);
-            modbus.resetSimulation();
-            System.out.println("nach motor");
-            Thread.sleep(200);
+        Thread.sleep(200);
+        modbus.resetSimulation();
+        Thread.sleep(200);
+        modbus.resetSimulation();
+        System.out.println("nach motor");
+        Thread.sleep(200);
+
+
+        modbus.startMotorUpV2();
+        Thread.sleep(2900);
+
+        modbus.startMotorUpV1();
+        Thread.sleep(1500);
+
+        modbus.startCrawl(1);
+        Thread.sleep(540);
+
+        modbus.stopMotor();
+        Thread.sleep(1000);
+
+        Thread.sleep(4000);
+
+
+        modbus.startMotorUpV2();
+        Thread.sleep(2900);
+
+        modbus.startMotorUpV1();
+        Thread.sleep(1500);
+
+        modbus.startCrawl(1);
+        Thread.sleep(540);
+
+        modbus.stopMotor();
+        Thread.sleep(1000);
+
+
+        Thread.sleep(4000);
+
+        modbus.startMotorUpV2();
+        Thread.sleep(2900);
+
+        modbus.startMotorUpV1();
+        Thread.sleep(1500);
+
+        modbus.startCrawl(1);
+        Thread.sleep(540);
+
+        modbus.stopMotor();
+        Thread.sleep(1000);
+
+        Thread.sleep(4000);
+
+        //downnnnnnnnnnnnnnnnnnnn
+        modbus.startMotorDownV2();
+        Thread.sleep(3150);
+
+        modbus.startMotorDownV1();
+        Thread.sleep(1600);
+
+        modbus.startCrawl(-1);
+        Thread.sleep(540);
+
+        modbus.stopMotor();
+        Thread.sleep(1000);
+
+        modbus.startMotorDownV2();
+        Thread.sleep(3150);
+
+        modbus.startMotorDownV1();
+        Thread.sleep(1600);
+
+        modbus.startCrawl(-1);
+        Thread.sleep(540);
+
+        modbus.stopMotor();
+        Thread.sleep(1000);
+
+        modbus.startMotorDownV2();
+        Thread.sleep(3150);
+
+        modbus.startMotorDownV1();
+        Thread.sleep(1600);
+
+        modbus.startCrawl(-1);
+        Thread.sleep(540);
+
+        modbus.stopMotor();
+        Thread.sleep(1000);
+
+
         modbus.readAllInputs();
 
 

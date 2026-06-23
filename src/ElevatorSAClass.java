@@ -223,7 +223,7 @@ public class ElevatorSAClass {
                 break;
 
             case V2_UP:
-                modbus.startMotorUpV2();
+               // modbus.startMotorUpV2();
                 break;
 
             case V1_DOWN:
