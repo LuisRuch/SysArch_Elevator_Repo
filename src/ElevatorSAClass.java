@@ -48,13 +48,14 @@ public class ElevatorSAClass {
         switch (currentState) {
 
             case RESETTING -> {
+                System.out.println("in reset state");
                 if (!opcuaInput.getReset()) {
                     changeState(State.STOPPED);
                 }
             }
 
             case STOPPED -> {
-
+                System.out.println("in stopped state");
                 //has to be before erasing stops / has to be if
                 if (do1() && centralLogic.getStatusInputs()[1]) {
                     changeState(State.OPENING_DOOR);
@@ -105,18 +106,21 @@ public class ElevatorSAClass {
             }
 
             case OPENING_DOOR -> {
+                System.out.println("in opening state");
                 if (do2()) {
                     changeState(State.STOPPED);
                 }
             }
 
             case CLOSING_DOOR -> {
+                System.out.println("in closing state");
                 if (dc2()) {
                     changeState(State.STOPPED);
                 }
             }
 
             case V2_UP -> {
+                System.out.println("in v1 up state");
                 if (ES()) {
                     changeState(State.STOPPED);
                 }
@@ -127,6 +131,7 @@ public class ElevatorSAClass {
 
             //same transitions
             case V1_UP, V1_DOWN -> {
+                System.out.println("in v1 up or down state");
                 if (ES()) {
                     changeState(State.STOPPED);
                 }
@@ -136,6 +141,7 @@ public class ElevatorSAClass {
             }
 
             case V2_DOWN -> {
+                System.out.println("in v2 down state");
                 if (ES()) {
                     changeState(State.STOPPED);
                 }
@@ -145,7 +151,7 @@ public class ElevatorSAClass {
             }
 
             case CRAWL -> {
-
+                System.out.println("in crawl state");
                 if(!centralLogic.getReachedSensorActive())
                 {
                     if(!wasReached)
@@ -199,7 +205,7 @@ public class ElevatorSAClass {
                 break;
 
             case STOPPED:
-                modbus.stopMotor();
+               // modbus.stopMotor();
                 modbus.stopDoor();
                 break;
 
@@ -318,7 +324,7 @@ public class ElevatorSAClass {
     private void performReset() throws Exception {
 
 
-        modbus.stopMotor();
+       // modbus.stopMotor();
         modbus.stopDoor();
         modbus.resetSimulation();
 
@@ -374,7 +380,7 @@ public class ElevatorSAClass {
     {
         //one sec after approach sensor triggort (0,5m) left
         //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
-        if (centralLogic.getApproachTimerUPMillisSeconds() >= 1 && modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel())
+        if (centralLogic.getApproachTimerUPMillisSeconds() >= 0.2 && modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel())
         {
             centralLogic.setApproachTimerUp(false);
             return true;

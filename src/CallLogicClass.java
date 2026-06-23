@@ -334,8 +334,8 @@ public class CallLogicClass
     {
         return switch (level)
         {
-            case 2 -> Req_Dir_Array[1];
-            case 3 -> Req_Dir_Array[3];
+            case 2 -> Req_Dir_Array[2];
+            case 3 -> Req_Dir_Array[4];
             case 4 -> Req_Dir_Array[5];
             default -> null; // Stockwerk 1 hat keinen Down-Taster
         };
@@ -346,8 +346,8 @@ public class CallLogicClass
         return switch (level)
         {
             case 1 -> Req_Dir_Array[0];
-            case 2 -> Req_Dir_Array[2];
-            case 3 -> Req_Dir_Array[4];
+            case 2 -> Req_Dir_Array[1];
+            case 3 -> Req_Dir_Array[3];
             default -> null; // Stockwerk 4 hat keinen Up-Taster
         };
     }

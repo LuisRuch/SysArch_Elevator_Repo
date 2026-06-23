@@ -94,6 +94,7 @@ public class CentralLogicClass {
         opcuaInput.handleInputs();
         polling.startPollingModbus();
         polling.startPollingReset();
+        //modbus.startOpenDoor();
     }
 
 

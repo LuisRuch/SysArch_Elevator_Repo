@@ -8,7 +8,12 @@ public class Main {
         ModbusClass modbus = new ModbusClass();
             modbus.connect();
             Thread.sleep(200);
-            modbus.readAllInputs();
+            modbus.resetSimulation();
+            Thread.sleep(200);
+            modbus.resetSimulation();
+            System.out.println("nach motor");
+            Thread.sleep(200);
+        modbus.readAllInputs();
 
 
         //creates CentralLogic Class + passes references

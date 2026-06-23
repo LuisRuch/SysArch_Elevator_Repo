@@ -2,7 +2,7 @@ public class OPCUAInputClass {
 
 
     private boolean insideLevel1 = false;
-    private boolean insideLevel2 = false;
+    private boolean insideLevel2 = true;
     private boolean insideLevel3 = false;
     private boolean insideLevel4 = false;
 

@@ -47,6 +47,7 @@ public class PollingClass {
                     centralLogic.setLevelInputs(modbus.getLevelInputs());
                     centralLogic.setStatusInputs(modbus.getStatusInputs());
                     centralLogic.setSpecialInputs(modbus.getSpecialInputs());
+                    System.out.println("readModbus in poll");
                     modbus.updateLastLowerApproachSensorFromLevelInputs();
                     modbus.updateLastUpperApproachSensorFromLevelInputs();
                     opcuaInput.handleInputs();
@@ -60,7 +61,9 @@ public class PollingClass {
                                 || centralLogic.getReachedSensorActive()))
                             callLogic.UpdateNextLevel();
 
+                        System.out.println("updates next level . poll");
                         centralLogic.calcfunctions();
+                        System.out.println("did calc");
                         elevatorSA.handleStateTransitions();
                     }
                     Thread.sleep(200);
