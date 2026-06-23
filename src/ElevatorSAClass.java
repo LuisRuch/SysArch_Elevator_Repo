@@ -9,6 +9,11 @@ public class ElevatorSAClass {
     private State lastState = State.STOPPED;
     private boolean wasReached = false;
 
+    private long inV2Timer  = 0;
+    private long inV1Timer  = 0;
+    private int levelWhereStartet = 1;
+    private int nrOfLvlTrv = 0;
+
     private ScheduledExecutorService schedulerDoor;
     private volatile int timerDoorLevel = 0;
 
@@ -130,12 +135,22 @@ public class ElevatorSAClass {
             }
 
             //same transitions
-            case V1_UP, V1_DOWN -> {
-                System.out.println("in v1 up or down state");
+            case V1_UP-> {
+                System.out.println("in v1 up state");
                 if (ES()) {
                     changeState(State.STOPPED);
                 }
                 else if (U3()) {
+                    changeState(State.CRAWL);
+                }
+            }
+
+            case V1_DOWN -> {
+                System.out.println("in v1 down state");
+                if (ES()) {
+                    changeState(State.STOPPED);
+                }
+                else if (D3()) {
                     changeState(State.CRAWL);
                 }
             }
@@ -157,16 +172,22 @@ public class ElevatorSAClass {
                     if(!wasReached)
                     {
                         if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up)
-                            modbus.startCrawl(2);
+                            modbus.startCrawl(1);
                         else
-                            modbus.startCrawl(-2);
+                            modbus.startCrawl(-1);
                     }
                     else
                     {
                         if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up)
+                        {
                             modbus.startCrawl(-1);
+                            modbus.stopMotor();
+                        }
                         else
+                        {
                             modbus.startCrawl(1);
+                            modbus.stopMotor();
+                        }
                     }
                 }
 
@@ -219,11 +240,14 @@ public class ElevatorSAClass {
                 break;
 
             case V1_UP:
+                inV1Timer = System.currentTimeMillis();
                 modbus.startMotorUpV1();
                 break;
 
             case V2_UP:
-               // modbus.startMotorUpV2();
+                inV2Timer = System.currentTimeMillis();
+                levelWhereStartet = callLogic.getCurrentLevel();
+                modbus.startMotorUpV2();
                 break;
 
             case V1_DOWN:
@@ -378,32 +402,73 @@ public class ElevatorSAClass {
     //v2 up state transitions
     private boolean U2()
     {
-        //one sec after approach sensor triggort (0,5m) left
-        //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
-        if (centralLogic.getApproachTimerUPMillisSeconds() >= 0.2 && modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel())
-        {
-            centralLogic.setApproachTimerUp(false);
-            return true;
+        //nextLevel - levelWhereStart = nr of level traveled
+        //if nr of level traveled = 1 -> true if inV2Timer = 2900ms
+        nrOfLvlTrv = callLogic.getNextLevel()-levelWhereStartet;
+
+        switch (nrOfLvlTrv) {
+            case 1:
+                if (System.currentTimeMillis() - inV2Timer >= 2900) {
+                    inV2Timer = 0;
+                    return true;
+                }
+
+            case 2:
+                if (System.currentTimeMillis() - inV2Timer >= 6400) {
+                    inV2Timer = 0;
+                    return true;
+                }
+
+
+            case 3:
+                if (System.currentTimeMillis() - inV2Timer >= 9900)
+                {
+                    inV2Timer = 0;
+                    return true;
+                }
         }
-        else
-            return false;
+
+        return false;
+
+
+//        //one sec after approach sensor triggort (0,5m) left
+//        //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
+//        if (centralLogic.getApproachTimerUPMillisSeconds() >= 0.2 && modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel())
+//        {
+//            centralLogic.setApproachTimerUp(false);
+//            return true;
+//        }
+//        else
+//            return false;
     }
 
     private boolean U3()
     {
-        //look a dirofTrav
-        //and level approach sensor == level form destination
-        //and
-        //saftey sensor - no matter which one -> physical space of elevator important
-        if(callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up){
-            if((modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySafetyStop())
-                return true;
+
+        if (System.currentTimeMillis() - inV1Timer >= 1500)
+        {
+            inV1Timer = 0;
+            return true;
         }
-        if(callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Down){
-            if((modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySafetyStop())
-                return true;
-        }
+
         return false;
+
+
+
+
+//        //look a dirofTrav
+//        //and level approach sensor == level form destination
+//        //and
+//        //saftey sensor - no matter which one -> physical space of elevator important
+//        if(callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up){
+//            if((modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySafetyStop())
+//                return true;
+//        }
+//        if(callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Down){
+//            if((modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySafetyStop())
+//                return true;
+//        }
+//        return false;
     }
 
     //v2 down state transitions
@@ -418,6 +483,11 @@ public class ElevatorSAClass {
         }
         else
             return false;
+    }
+
+    private boolean D3()
+    {
+        return false;
     }
 
     //crawl

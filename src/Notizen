@@ -24,3 +24,5 @@ sauber des mit dem exeptions machen
 wenn tür zu ist, dann fährt elevator direkt los. man kann nicht nochmal auf machen
 Der Motor wird immer kurz komplett gestopped wenn neues signal. mal schauen ob man das sieht
 
+approachTimerStartUP = System.currentTimeMillis();
+(System.currentTimeMillis() - approachTimerStartUP)/1000;
