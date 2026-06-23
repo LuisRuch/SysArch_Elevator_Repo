@@ -14,9 +14,12 @@ public class Main {
         System.out.println("nach motor");
         Thread.sleep(200);
 
-
+        //2900 one
+        //6400 two
+        //diff 3500
+        //9900 three
         modbus.startMotorUpV2();
-        Thread.sleep(2900);
+        Thread.sleep(9900);
 
         modbus.startMotorUpV1();
         Thread.sleep(1500);
@@ -30,38 +33,38 @@ public class Main {
         Thread.sleep(4000);
 
 
-        modbus.startMotorUpV2();
-        Thread.sleep(2900);
-
-        modbus.startMotorUpV1();
-        Thread.sleep(1500);
-
-        modbus.startCrawl(1);
-        Thread.sleep(540);
-
-        modbus.stopMotor();
-        Thread.sleep(1000);
-
-
-        Thread.sleep(4000);
-
-        modbus.startMotorUpV2();
-        Thread.sleep(2900);
-
-        modbus.startMotorUpV1();
-        Thread.sleep(1500);
-
-        modbus.startCrawl(1);
-        Thread.sleep(540);
-
-        modbus.stopMotor();
-        Thread.sleep(1000);
-
-        Thread.sleep(4000);
+//        modbus.startMotorUpV2();
+//        Thread.sleep(2900);
+//
+//        modbus.startMotorUpV1();
+//        Thread.sleep(1500);
+//
+//        modbus.startCrawl(1);
+//        Thread.sleep(540);
+//
+//        modbus.stopMotor();
+//        Thread.sleep(1000);
+//
+//
+//        Thread.sleep(4000);
+//
+//        modbus.startMotorUpV2();
+//        Thread.sleep(2900);
+//
+//        modbus.startMotorUpV1();
+//        Thread.sleep(1500);
+//
+//        modbus.startCrawl(1);
+//        Thread.sleep(540);
+//
+//        modbus.stopMotor();
+//        Thread.sleep(1000);
+//
+//        Thread.sleep(4000);
 
         //downnnnnnnnnnnnnnnnnnnn
         modbus.startMotorDownV2();
-        Thread.sleep(3150);
+        Thread.sleep(3250);
 
         modbus.startMotorDownV1();
         Thread.sleep(1600);
@@ -70,10 +73,12 @@ public class Main {
         Thread.sleep(540);
 
         modbus.stopMotor();
-        Thread.sleep(1000);
+        Thread.sleep(4000);
+
+
 
         modbus.startMotorDownV2();
-        Thread.sleep(3150);
+        Thread.sleep(3250);
 
         modbus.startMotorDownV1();
         Thread.sleep(1600);
@@ -82,10 +87,12 @@ public class Main {
         Thread.sleep(540);
 
         modbus.stopMotor();
-        Thread.sleep(1000);
+
+
+        Thread.sleep(4000);
 
         modbus.startMotorDownV2();
-        Thread.sleep(3150);
+        Thread.sleep(3250);
 
         modbus.startMotorDownV1();
         Thread.sleep(1600);
