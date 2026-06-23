@@ -120,7 +120,7 @@ public class ElevatorSAClass {
             }
 
             case V2_UP -> {
-                System.out.println("in v1 up state");
+                System.out.println("in v2 up state");
                 if (ES()) {
                     changeState(State.STOPPED);
                 }
@@ -205,7 +205,7 @@ public class ElevatorSAClass {
                 break;
 
             case STOPPED:
-               // modbus.stopMotor();
+                modbus.stopMotor();
                 modbus.stopDoor();
                 break;
 
