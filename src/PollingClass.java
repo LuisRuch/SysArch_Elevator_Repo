@@ -42,10 +42,10 @@ public class PollingClass {
         pollingModbusThread.start();
     }
 
-    public void startPollingRest()
+    public void startPollingReset()
     {
         runningRest = true;
-        Thread pollingRestThread = new Thread(() -> {
+        Thread pollingResetThread = new Thread(() -> {
             while (runningRest) {
                 try {
                     opcuaInput.handleInputs();
@@ -64,11 +64,11 @@ public class PollingClass {
                     }
                     Thread.sleep(200);
                 } catch (Exception e) {
-                    System.err.println("Rest reading error: " + e.getMessage());
+                    System.err.println("Rsdfsadft reading error: " + e.getMessage());
                 }
             }
         });
         //pollingModbusThread.setDaemon(true); // Thread stops if main stops
-        pollingRestThread.start();
+        pollingResetThread.start();
     }
 }

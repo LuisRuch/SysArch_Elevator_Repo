@@ -83,10 +83,17 @@ public class CentralLogicClass {
 
     }
 
-    public void start()
+    public void start() throws Exception
     {
+        modbus.readAllInputs();
+        setLevelInputs(modbus.getLevelInputs());
+        setStatusInputs(modbus.getStatusInputs());
+        setSpecialInputs(modbus.getSpecialInputs());
+        modbus.updateLastLowerApproachSensorFromLevelInputs();
+        modbus.updateLastUpperApproachSensorFromLevelInputs();
+        opcuaInput.handleInputs();
         polling.startPollingModbus();
-        polling.startPollingRest();
+        polling.startPollingReset();
     }
 
 

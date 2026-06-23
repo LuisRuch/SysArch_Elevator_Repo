@@ -128,7 +128,7 @@ public class OPCUAInputClass {
 
         if (outsideLevel4Down) {
             if (centralLogic.getReq_Dir_Array()[5] != null) {
-                centralLogic.setStops(5, true);
+                centralLogic.setStops(4, true);
                 centralLogic.setReq_Dir_Array(5, CentralLogicClass.Req_Dir.DontCare);
             }
 

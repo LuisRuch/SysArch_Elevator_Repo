@@ -421,69 +421,69 @@ public class CallLogicClass
         DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
     }
 
-    private boolean hasStopAbove()
-    {
-        for (int i = currentLevel + 1; i <= maxLevel; i++)
-        {
-            if (stops[i])
-                return true;
-        }
-        return false;
-    }
-
-    private boolean hasStopBelow()
-    {
-        for (int i = currentLevel - 1; i >= minLevel; i--)
-        {
-            if (stops[i])
-                return true;
-        }
-        return false;
-    }
-
-    private int distanceToNextStopAbove()
-    {
-        for (int i = currentLevel + 1; i <= maxLevel; i++)
-        {
-            if (stops[i])
-                return i - currentLevel;
-        }
-        return Integer.MAX_VALUE;
-    }
-
-    private int distanceToNextStopBelow()
-    {
-        for (int i = currentLevel - 1; i >= minLevel; i--)
-        {
-            if (stops[i])
-                return currentLevel - i;
-        }
-        return Integer.MAX_VALUE;
-    }
-
-    private void chooseInitialDirection()
-    {
-        boolean stopAbove = hasStopAbove();
-        boolean stopBelow = hasStopBelow();
-
-        if (stopAbove && !stopBelow)
-        {
-            DirOfTrv = CentralLogicClass.Req_Dir.Up;
-        }
-        else if (!stopAbove && stopBelow)
-        {
-            DirOfTrv = CentralLogicClass.Req_Dir.Down;
-        }
-        else if (stopAbove && stopBelow)
-        {
-            // If calls exist on both sides, take the closer side first.
-            // In a tie, keep the old behaviour and prefer Up.
-            if (distanceToNextStopAbove() <= distanceToNextStopBelow())
-                DirOfTrv = CentralLogicClass.Req_Dir.Up;
-            else
-                DirOfTrv = CentralLogicClass.Req_Dir.Down;
-        }
-    }
+//    private boolean hasStopAbove()
+//    {
+//        for (int i = currentLevel + 1; i <= maxLevel; i++)
+//        {
+//            if (stops[i])
+//                return true;
+//        }
+//        return false;
+//    }
+//
+//    private boolean hasStopBelow()
+//    {
+//        for (int i = currentLevel - 1; i >= minLevel; i--)
+//        {
+//            if (stops[i])
+//                return true;
+//        }
+//        return false;
+//    }
+//
+//    private int distanceToNextStopAbove()
+//    {
+//        for (int i = currentLevel + 1; i <= maxLevel; i++)
+//        {
+//            if (stops[i])
+//                return i - currentLevel;
+//        }
+//        return Integer.MAX_VALUE;
+//    }
+//
+//    private int distanceToNextStopBelow()
+//    {
+//        for (int i = currentLevel - 1; i >= minLevel; i--)
+//        {
+//            if (stops[i])
+//                return currentLevel - i;
+//        }
+//        return Integer.MAX_VALUE;
+//    }
+//
+//    private void chooseInitialDirection()
+//    {
+//        boolean stopAbove = hasStopAbove();
+//        boolean stopBelow = hasStopBelow();
+//
+//        if (stopAbove && !stopBelow)
+//        {
+//            DirOfTrv = CentralLogicClass.Req_Dir.Up;
+//        }
+//        else if (!stopAbove && stopBelow)
+//        {
+//            DirOfTrv = CentralLogicClass.Req_Dir.Down;
+//        }
+//        else if (stopAbove && stopBelow)
+//        {
+//            // If calls exist on both sides, take the closer side first.
+//            // In a tie, keep the old behaviour and prefer Up.
+//            if (distanceToNextStopAbove() <= distanceToNextStopBelow())
+//                DirOfTrv = CentralLogicClass.Req_Dir.Up;
+//            else
+//                DirOfTrv = CentralLogicClass.Req_Dir.Down;
+//        }
+//    }
 
     private void switchDirection()
     {
@@ -498,13 +498,13 @@ public class CallLogicClass
         //new next level
         if(logic.getReachedSensorActive())
         {
-            if(logic.getStatusInputs()[1])
+            if(logic.getLevelInputs()[1])
                 nextLevel=1;
-            if(logic.getStatusInputs()[9])
+            else if(logic.getLevelInputs()[9])
                 nextLevel= 2;
-            if(logic.getStatusInputs()[17])
+            else if(logic.getLevelInputs()[17])
                 nextLevel= 3;
-            if(logic.getStatusInputs()[25])
+            else if(logic.getLevelInputs()[25])
                 nextLevel= 4;
         }
         /*
