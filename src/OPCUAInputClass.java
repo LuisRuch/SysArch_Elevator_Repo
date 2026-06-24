@@ -4,14 +4,14 @@ public class OPCUAInputClass {
     private boolean insideLevel1 = false;
     private boolean insideLevel2 = false;
     private boolean insideLevel3 = false;
-    private boolean insideLevel4 = true;
+    private boolean insideLevel4 = false;
 
-    private boolean outsideLevel1Up = false;
-    private boolean outsideLevel2Up = false;
+    private boolean outsideLevel1Up = true;
+    private boolean outsideLevel2Up = true;
     private boolean outsideLevel2Down = true;
-    private boolean outsideLevel3Up = true;
+    private boolean outsideLevel3Up = false;
     private boolean outsideLevel3Down = true;
-    private boolean outsideLevel4Down = false;
+    private boolean outsideLevel4Down = true;
 
     private boolean OpenDoor = false;
     private boolean CloseDoor = false;
@@ -66,10 +66,9 @@ public class OPCUAInputClass {
         }
 
         if (outsideLevel1Up) {
-            if (centralLogic.getReq_Dir_Array()[0] != null) {
                 centralLogic.setStops(1, true);
-                centralLogic.setReq_Dir_Array(1, CentralLogicClass.Req_Dir.DontCare);
-            }
+                centralLogic.setReq_Dir_Array(1, CentralLogicClass.Req_Dir.Up);
+
 
             outsideLevel1Up = false;
         }
@@ -127,10 +126,9 @@ public class OPCUAInputClass {
         }
 
         if (outsideLevel4Down) {
-            if (centralLogic.getReq_Dir_Array()[5] != null) {
-                centralLogic.setStops(4, true);
-                centralLogic.setReq_Dir_Array(5, CentralLogicClass.Req_Dir.DontCare);
-            }
+            centralLogic.setStops(4, true);
+            centralLogic.setReq_Dir_Array(5, CentralLogicClass.Req_Dir.DontCare);
+
 
             outsideLevel4Down = false;
         }

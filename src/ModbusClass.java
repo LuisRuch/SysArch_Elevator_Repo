@@ -125,52 +125,6 @@ public class ModbusClass {
         return specialInputs;
     }
 
-    //vielleich in central
-    //des gleich noch für down
-    public void updateLastLowerApproachSensorFromLevelInputs() {
-        if (levelInputs == null) {
-            return;
-        }
-
-        if (levelInputs[7]) {
-            lastLowerApproachSensorLevel = 2;
-        } else if (levelInputs[15]) {
-            lastLowerApproachSensorLevel = 3;
-        } else if (levelInputs[23]) {
-            lastLowerApproachSensorLevel = 4;
-        }
-    }
-
-    public int getLastLowerApproachSensorLevel() {
-        return lastLowerApproachSensorLevel;
-    }
-
-    public void updateLastUpperApproachSensorFromLevelInputs() {
-        if (levelInputs == null) {
-            return;
-        }
-
-        if (levelInputs[3]) {
-            lastUpperApproachSensorLevel = 1;
-        } else if (levelInputs[11]) {
-            lastUpperApproachSensorLevel = 2;
-        } else if (levelInputs[19]) {
-            lastUpperApproachSensorLevel = 3;
-        }
-    }
-
-    public int getLastUpperApproachSensorLevel() {
-        return lastUpperApproachSensorLevel;
-    }
-
-    public void setLastLowerApproachSensorLevel(int level) {
-        this.lastLowerApproachSensorLevel = level;
-    }
-
-    public void setLastUpperApproachSensorLevel(int level) {
-        this.lastUpperApproachSensorLevel = level;
-    }
-
 
 
     // Output methods

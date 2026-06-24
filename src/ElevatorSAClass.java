@@ -79,14 +79,12 @@ public class ElevatorSAClass {
                         case 2 -> {centralLogic.setReq_Dir_Array(1, null);
                                     centralLogic.setReq_Dir_Array(2, null);}
                         case 3 -> {centralLogic.setReq_Dir_Array(3, null);
-                            centralLogic.setReq_Dir_Array(2, null);}
-                        case 4 -> centralLogic.setReq_Dir_Array(4, null);
+                            centralLogic.setReq_Dir_Array(4, null);}
+                        case 4 -> centralLogic.setReq_Dir_Array(5, null);
                     }
 
 
-                    centralLogic.setReq_Dir_Array(callLogic.getCurrentLevel(), null);
-                    centralLogic.setReq_Dir_Array(callLogic.getCurrentLevel(), null);
-                }
+             }
 
                 //here if else can start
                 if(dc1() && centralLogic.getStatusInputs()[0]){
@@ -394,19 +392,26 @@ public class ElevatorSAClass {
         centralLogic.setStops(2,false);
         centralLogic.setStops(3,false);
         centralLogic.setStops(4,false);
+        centralLogic.setReq_Dir_Array(0, null);
         centralLogic.setReq_Dir_Array(1, null);
         centralLogic.setReq_Dir_Array(2, null);
         centralLogic.setReq_Dir_Array(3, null);
         centralLogic.setReq_Dir_Array(4, null);
+        centralLogic.setReq_Dir_Array(5, null);
         centralLogic.setReachedTimerRunning(false);
         centralLogic.setReachedTimerStart(0);
         centralLogic.setMode(CentralLogicClass.Mode.IDLE);
-        modbus.setLastLowerApproachSensorLevel(0);
-        modbus.setLastUpperApproachSensorLevel(0);
         callLogic.setCurrentLevel(1);
         callLogic.setDifference(0);
         callLogic.setNextLevel(1);
         callLogic.setDirOfTrv(CentralLogicClass.Req_Dir.DontCare);
+
+        inV1Timer = 0;
+        inV2Timer = 0;
+        timeDone = 0;
+        wasReached = false;
+        levelWhereStartet = 1;
+        nrOfLvlTrv = 0;
     }
 
 
@@ -418,7 +423,7 @@ public class ElevatorSAClass {
         //OR
         // - no call exists and 12 seconds waited and no ES
 
-        if ((getDoorTimerLevel() >= 6 && centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 6 && opcuaInput.getCloseDoor() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 12 && !centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()))
+        if ((getDoorTimerLevel() >= 1 && centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 1 && opcuaInput.getCloseDoor() && !opcuaInput.getEmergencyStop()) || (getDoorTimerLevel() >= 2 && !centralLogic.hasAnyStop() && !opcuaInput.getEmergencyStop()))
         {
             stopDoorTimer();
             return true;

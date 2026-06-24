@@ -89,8 +89,6 @@ public class CentralLogicClass {
         setLevelInputs(modbus.getLevelInputs());
         setStatusInputs(modbus.getStatusInputs());
         setSpecialInputs(modbus.getSpecialInputs());
-        modbus.updateLastLowerApproachSensorFromLevelInputs();
-        modbus.updateLastUpperApproachSensorFromLevelInputs();
         opcuaInput.handleInputs();
 
         runningPolling = true;
@@ -101,8 +99,6 @@ public class CentralLogicClass {
                     setLevelInputs(modbus.getLevelInputs());
                     setStatusInputs(modbus.getStatusInputs());
                     setSpecialInputs(modbus.getSpecialInputs());
-                    modbus.updateLastLowerApproachSensorFromLevelInputs();
-                    modbus.updateLastUpperApproachSensorFromLevelInputs();
                     opcuaInput.handleInputs();
                     if(!opcuaInput.getSupervisor())
                     {
