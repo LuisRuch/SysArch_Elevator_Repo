@@ -11,6 +11,7 @@ public class ElevatorSAClass {
 
     private long inV2Timer  = 0;
     private long inV1Timer  = 0;
+    private long timeDone = 0;
     private int levelWhereStartet = 1;
     private int nrOfLvlTrv = 0;
 
@@ -171,6 +172,7 @@ public class ElevatorSAClass {
                 {
                     if(!wasReached)
                     {
+                        System.out.println("before");
                         if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up)
                             modbus.startCrawl(1);
                         else
@@ -178,6 +180,7 @@ public class ElevatorSAClass {
                     }
                     else
                     {
+                        System.out.println("after");
                         if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up)
                         {
                             modbus.startCrawl(-1);
@@ -190,9 +193,11 @@ public class ElevatorSAClass {
                         }
                     }
                 }
-
-                if(centralLogic.getReachedSensorActive())
+                else
+                {
+                    System.out.println("reached sensor");
                     wasReached = true;
+                }
 
                 //Transitions
                 if (ES()) {
@@ -226,6 +231,20 @@ public class ElevatorSAClass {
                 break;
 
             case STOPPED:
+                if(inV2Timer != 0)
+                {
+                    timeDone = System.currentTimeMillis() - inV2Timer;
+                    System.out.println("timeDonev2............................");
+                }
+
+
+                if(inV1Timer != 0)
+                {
+                    timeDone = System.currentTimeMillis() - inV1Timer;
+                    System.out.println("timeDonev1.....................");
+                }
+
+
                 modbus.stopMotor();
                 modbus.stopDoor();
                 break;
@@ -251,10 +270,13 @@ public class ElevatorSAClass {
                 break;
 
             case V1_DOWN:
+                inV1Timer = System.currentTimeMillis();
                 modbus.startMotorDownV1();
                 break;
 
             case V2_DOWN:
+                inV2Timer = System.currentTimeMillis();
+                levelWhereStartet = callLogic.getCurrentLevel();
                 modbus.startMotorDownV2();
                 break;
 
@@ -408,22 +430,25 @@ public class ElevatorSAClass {
 
         switch (nrOfLvlTrv) {
             case 1:
-                if (System.currentTimeMillis() - inV2Timer >= 2900) {
+                if (System.currentTimeMillis() - inV2Timer + timeDone >= 2900) {
                     inV2Timer = 0;
+                    timeDone = 0;
                     return true;
                 }
 
             case 2:
-                if (System.currentTimeMillis() - inV2Timer >= 6400) {
+                if (System.currentTimeMillis() - inV2Timer + timeDone>= 6400) {
                     inV2Timer = 0;
+                    timeDone = 0;
                     return true;
                 }
 
 
             case 3:
-                if (System.currentTimeMillis() - inV2Timer >= 9900)
+                if (System.currentTimeMillis() - inV2Timer + timeDone >= 9900)
                 {
                     inV2Timer = 0;
+                    timeDone = 0;
                     return true;
                 }
         }
@@ -445,9 +470,10 @@ public class ElevatorSAClass {
     private boolean U3()
     {
 
-        if (System.currentTimeMillis() - inV1Timer >= 1500)
+        if (System.currentTimeMillis() - inV1Timer + timeDone>= 1500)
         {
             inV1Timer = 0;
+            timeDone = 0;
             return true;
         }
 
@@ -474,19 +500,57 @@ public class ElevatorSAClass {
     //v2 down state transitions
     private boolean D2()
     {
-        //one sec after approach sensor triggort (0,5m) left
-        //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
-        if (centralLogic.getApproachTimerDOWNMillisSeconds() >= 1 && modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel())
+        //nextLevel - levelWhereStart = nr of level traveled
+        //if nr of level traveled = 1 -> true if inV2Timer = 2900ms
+        nrOfLvlTrv = levelWhereStartet - callLogic.getNextLevel();
+
+        switch (nrOfLvlTrv)
         {
-            centralLogic.setApproachTimerDOWN(false);
-            return true;
+            case 1:
+                if (System.currentTimeMillis() - inV2Timer + timeDone>= 3400) {
+                    System.out.println("80"+timeDone);
+                    inV2Timer = 0;
+                    timeDone = 0;
+                    return true;
+                }
+
+            case 2:
+                if (System.currentTimeMillis() - inV2Timer + timeDone >= 6900) {
+                    inV2Timer = 0;
+                    timeDone = 0;
+                    return true;
+                }
+
+
+            case 3:
+                if (System.currentTimeMillis() - inV2Timer + timeDone>= 10400) {
+                    inV2Timer = 0;
+                    timeDone = 0;
+                    return true;
+                }
         }
-        else
-            return false;
+        return false;
+
+//        //one sec after approach sensor triggort (0,5m) left
+//        //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
+//        if (centralLogic.getApproachTimerDOWNMillisSeconds() >= 1 && modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel())
+//        {
+//            centralLogic.setApproachTimerDOWN(false);
+//            return true;
+//        }
+//        else
+//            return false;
     }
 
     private boolean D3()
     {
+        if (System.currentTimeMillis() - inV1Timer + timeDone>= 3870)
+        {
+            inV1Timer = 0;
+            timeDone = 0;
+            return true;
+        }
+
         return false;
     }
 
