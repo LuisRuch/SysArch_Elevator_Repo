@@ -9,7 +9,7 @@ public class OPCUAInputClass {
     private boolean outsideLevel1Up = false;
     private boolean outsideLevel2Up = false;
     private boolean outsideLevel2Down = true;
-    private boolean outsideLevel3Up = false;
+    private boolean outsideLevel3Up = true;
     private boolean outsideLevel3Down = true;
     private boolean outsideLevel4Down = false;
 

@@ -1,78 +1,78 @@
-public class PollingClass {
-
-    CentralLogicClass centralLogic;
-    CallLogicClass callLogic;
-    OPCUAInputClass opcuaInput;
-    ElevatorSAClass elevatorSA;
-    ModbusClass modbus;
-
-    private boolean runningModbus = false;
-    private boolean runningRest = false;
-
-    public PollingClass(CentralLogicClass centralLogic, CallLogicClass callLogic, OPCUAInputClass opcuaInput,ElevatorSAClass elevatorSA, ModbusClass modbus)
-    {
-        this.centralLogic = centralLogic;
-        this.callLogic = callLogic;
-        this.opcuaInput = opcuaInput;
-        this.elevatorSA = elevatorSA;
-        this.modbus = modbus;
-    }
-
-
-    //start Modbus
-    public void startPollingModbus()
-    {
-        runningModbus = true;
-        Thread pollingModbusThread = new Thread(() -> {
-            while (runningModbus) {
-                try {
-
-                    Thread.sleep(200);
-                } catch (Exception e) {
-                    System.err.println("Modbus reading error: " + e.getMessage());
-                }
-            }
-        });
-        //pollingModbusThread.setDaemon(true); // Thread stops if main stops
-        pollingModbusThread.start();
-    }
-
-    public void startPollingReset()
-    {
-        runningRest = true;
-        Thread pollingResetThread = new Thread(() -> {
-            while (runningRest) {
-                try {
-                    modbus.readAllInputs();
-                    centralLogic.setLevelInputs(modbus.getLevelInputs());
-                    centralLogic.setStatusInputs(modbus.getStatusInputs());
-                    centralLogic.setSpecialInputs(modbus.getSpecialInputs());
-                    System.out.println("readModbus in poll");
-                    modbus.updateLastLowerApproachSensorFromLevelInputs();
-                    modbus.updateLastUpperApproachSensorFromLevelInputs();
-                    opcuaInput.handleInputs();
-                    if(!opcuaInput.getSupervisor())
-                    {
-                        //if v1u/d or crawl or stopped aber kein reached -> skip updateNextLevel
-                        if (elevatorSA.getCurrentState() != ElevatorSAClass.State.V1_UP
-                                && elevatorSA.getCurrentState() != ElevatorSAClass.State.V1_DOWN
-                                && elevatorSA.getCurrentState() != ElevatorSAClass.State.CRAWL
-                                && (elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED
-                                || centralLogic.getReachedSensorActive()))
-                            callLogic.UpdateNextLevel();
-
-                        System.out.println("updates next level . poll");
-                        centralLogic.calcfunctions();
-                        System.out.println("did calc");
-                        elevatorSA.handleStateTransitions();
-                    }
-                    Thread.sleep(200);
-                } catch (Exception e) {
-                    System.err.println("Rsdfsadft reading error: " + e.getMessage());
-                }
-            }
-        });
-        //pollingModbusThread.setDaemon(true); // Thread stops if main stops
-        pollingResetThread.start();
-    }
-}
+//public class PollingClass {
+//
+//    CentralLogicClass centralLogic;
+//    CallLogicClass callLogic;
+//    OPCUAInputClass opcuaInput;
+//    ElevatorSAClass elevatorSA;
+//    ModbusClass modbus;
+//
+//    private boolean runningModbus = false;
+//    private boolean runningRest = false;
+//
+//    public PollingClass(CentralLogicClass centralLogic, CallLogicClass callLogic, OPCUAInputClass opcuaInput,ElevatorSAClass elevatorSA, ModbusClass modbus)
+//    {
+//        this.centralLogic = centralLogic;
+//        this.callLogic = callLogic;
+//        this.opcuaInput = opcuaInput;
+//        this.elevatorSA = elevatorSA;
+//        this.modbus = modbus;
+//    }
+//
+//
+//    //start Modbus
+//    public void startPollingModbus()
+//    {
+//        runningModbus = true;
+//        Thread pollingModbusThread = new Thread(() -> {
+//            while (runningModbus) {
+//                try {
+//
+//                    Thread.sleep(200);
+//                } catch (Exception e) {
+//                    System.err.println("Modbus reading error: " + e.getMessage());
+//                }
+//            }
+//        });
+//        //pollingModbusThread.setDaemon(true); // Thread stops if main stops
+//        pollingModbusThread.start();
+//    }
+//
+//    public void startPollingReset()
+//    {
+//        runningRest = true;
+//        Thread pollingResetThread = new Thread(() -> {
+//            while (runningRest) {
+//                try {
+//                    modbus.readAllInputs();
+//                    centralLogic.setLevelInputs(modbus.getLevelInputs());
+//                    centralLogic.setStatusInputs(modbus.getStatusInputs());
+//                    centralLogic.setSpecialInputs(modbus.getSpecialInputs());
+//                    System.out.println("readModbus in poll");
+//                    modbus.updateLastLowerApproachSensorFromLevelInputs();
+//                    modbus.updateLastUpperApproachSensorFromLevelInputs();
+//                    opcuaInput.handleInputs();
+//                    if(!opcuaInput.getSupervisor())
+//                    {
+//                        //if v1u/d or crawl or stopped aber kein reached -> skip updateNextLevel
+//                        if (elevatorSA.getCurrentState() != ElevatorSAClass.State.V1_UP
+//                                && elevatorSA.getCurrentState() != ElevatorSAClass.State.V1_DOWN
+//                                && elevatorSA.getCurrentState() != ElevatorSAClass.State.CRAWL
+//                                && (elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED
+//                                || centralLogic.getReachedSensorActive()))
+//                            callLogic.UpdateNextLevel();
+//
+//                        System.out.println("updates next level . poll");
+//                        centralLogic.calcfunctions();
+//                        System.out.println("did calc");
+//                        elevatorSA.handleStateTransitions();
+//                    }
+//                    Thread.sleep(200);
+//                } catch (Exception e) {
+//                    System.err.println("Rsdfsadft reading error: " + e.getMessage());
+//                }
+//            }
+//        });
+//        //pollingModbusThread.setDaemon(true); // Thread stops if main stops
+//        pollingResetThread.start();
+//    }
+//}

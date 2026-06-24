@@ -58,19 +58,18 @@ public class CentralLogicClass {
     private boolean[] statusInputs;      // IX10.0 bis IX10.4
     private long[] specialInputs;        // [0] cycles, [1] aufzugID, [2] speed
 
-    private boolean approachTimerUPRunning = false;
-    private long approachTimerStartUP = 0;
-    private boolean approachTimerDOWNRunning = false;
-    private long approachTimerStartDOWN = 0;
+
     private boolean reachedTimerRunning = false;
     private long reachedTimerStart = 0;
+
+    private boolean runningPolling = false;
 
     ModbusClass modbus;
 
     CallLogicClass callLogic;
     OPCUAInputClass opcuaInput;
     ElevatorSAClass elevatorSA;
-    PollingClass polling;
+    //PollingClass polling;
 
     public CentralLogicClass(ModbusClass modbus)
     {
@@ -79,12 +78,13 @@ public class CentralLogicClass {
         callLogic = new CallLogicClass(stops,Req_Dir_Array,this);
         opcuaInput = new OPCUAInputClass(this,modbus);
         elevatorSA = new ElevatorSAClass(this,opcuaInput,modbus,callLogic);
-        polling = new PollingClass(this,callLogic,opcuaInput,elevatorSA, modbus);
+       // polling = new PollingClass(this,callLogic,opcuaInput,elevatorSA, modbus);
 
     }
 
-    public void start() throws Exception
+    public void startPolling() throws Exception
     {
+        //pre
         modbus.readAllInputs();
         setLevelInputs(modbus.getLevelInputs());
         setStatusInputs(modbus.getStatusInputs());
@@ -92,10 +92,41 @@ public class CentralLogicClass {
         modbus.updateLastLowerApproachSensorFromLevelInputs();
         modbus.updateLastUpperApproachSensorFromLevelInputs();
         opcuaInput.handleInputs();
-        polling.startPollingModbus();
-        polling.startPollingReset();
-        //modbus.startOpenDoor();
+
+        runningPolling = true;
+        Thread pollingThread = new Thread(() -> {
+            while (runningPolling) {
+                try {
+                    modbus.readAllInputs();
+                    setLevelInputs(modbus.getLevelInputs());
+                    setStatusInputs(modbus.getStatusInputs());
+                    setSpecialInputs(modbus.getSpecialInputs());
+                    modbus.updateLastLowerApproachSensorFromLevelInputs();
+                    modbus.updateLastUpperApproachSensorFromLevelInputs();
+                    opcuaInput.handleInputs();
+                    if(!opcuaInput.getSupervisor())
+                    {
+                        //if v1u/d or crawl or stopped aber kein reached -> skip updateNextLevel
+                        if (elevatorSA.getCurrentState() != ElevatorSAClass.State.V1_UP
+                                && elevatorSA.getCurrentState() != ElevatorSAClass.State.V1_DOWN
+                                && elevatorSA.getCurrentState() != ElevatorSAClass.State.CRAWL
+                                && (elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED
+                                || getReachedSensorActive()))
+                            callLogic.UpdateNextLevel();
+
+                        calcfunctions();
+                        elevatorSA.handleStateTransitions();
+                    }
+                    Thread.sleep(200);
+                } catch (Exception e) {
+                    System.err.println("Rsdfsadft reading error: " + e.getMessage());
+                }
+            }
+        });
+        //pollingModbusThread.setDaemon(true); // Thread stops if main stops
+        pollingThread.start();
     }
+
 
 
     //special Information
@@ -114,8 +145,7 @@ public class CentralLogicClass {
             mode = Mode.OnCall;
         }
 
-        checkApproachTimerUP();
-        checkApproachTimerDOWN();
+
         checkReachedTimer();
 
     }
@@ -129,88 +159,7 @@ public class CentralLogicClass {
         return false;
     }
 
-    //working with timestamps - no timer
-    public void checkApproachTimerUP() {
-        if (levelInputs == null) {
-            return;
-        }
 
-        // nextLevel 2: Lower Approach L2 = index 7, Upper Approach L2 = index 11
-        if (callLogic.getNextLevel() == 2) {
-            if (approachTimerUPRunning && levelInputs[11]) {
-                approachTimerUPRunning = false;
-                return;
-            }
-
-            if (!approachTimerUPRunning && levelInputs[7]) {
-                approachTimerUPRunning = true;
-                approachTimerStartUP = System.currentTimeMillis();
-            }
-        }
-
-        // nextLevel 3: Lower Approach L3 = index 15, Upper Approach L3 = index 19
-        else if (callLogic.getNextLevel() == 3) {
-            if (approachTimerUPRunning && levelInputs[19]) {
-                approachTimerUPRunning = false;
-                return;
-            }
-
-            if (!approachTimerUPRunning && levelInputs[15]) {
-                approachTimerUPRunning = true;
-                approachTimerStartUP = System.currentTimeMillis();
-            }
-        }
-
-        // nextLevel 4: Lower Approach L4 = index 23
-        // Für Level 4 hast du keinen Upper Approach Sensor definiert
-        else if (callLogic.getNextLevel() == 4) {
-            if (!approachTimerUPRunning && levelInputs[23]) {
-                approachTimerUPRunning = true;
-                approachTimerStartUP = System.currentTimeMillis();
-            }
-        }
-    }
-
-    public void checkApproachTimerDOWN() {
-        if (levelInputs == null) {
-            return;
-        }
-
-        // nextLevel 1: Upper Approach L1 = index 3
-        // Für Level 1 hast du keinen Lower Approach Sensor definiert
-        if (callLogic.getNextLevel() == 1) {
-            if (!approachTimerDOWNRunning && levelInputs[3]) {
-                approachTimerDOWNRunning = true;
-                approachTimerStartDOWN = System.currentTimeMillis();
-            }
-        }
-
-        // nextLevel 2: Upper Approach L2 = index 11, Lower Approach L2 = index 7
-        else if (callLogic.getNextLevel() == 2) {
-            if (approachTimerDOWNRunning && levelInputs[7]) {
-                approachTimerDOWNRunning = false;
-                return;
-            }
-
-            if (!approachTimerDOWNRunning && levelInputs[11]) {
-                approachTimerDOWNRunning = true;
-                approachTimerStartDOWN = System.currentTimeMillis();
-            }
-        }
-
-        // nextLevel 3: Upper Approach L3 = index 19, Lower Approach L3 = index 15
-        else if (callLogic.getNextLevel() == 3) {
-            if (approachTimerDOWNRunning && levelInputs[15]) {
-                approachTimerDOWNRunning = false;
-                return;
-            }
-
-            if (!approachTimerDOWNRunning && levelInputs[19]) {
-                approachTimerDOWNRunning = true;
-                approachTimerStartDOWN = System.currentTimeMillis();
-            }
-        }
-    }
 
     public boolean checkReachedTimer() {
 
@@ -240,49 +189,20 @@ public class CentralLogicClass {
 
 
     //Getter und Setter
-    public void setApproachTimerStartUP(long value) {
-        approachTimerStartUP = value;
-    }
 
-    public void setApproachTimerStartDOWN(long value) {
-        approachTimerStartDOWN = value;
-    }
-
-    public void setReachedTimerRunning(boolean running) {
+    public void setReachedTimerRunning(boolean running)
+    {
         reachedTimerRunning = running;
     }
 
-    public void setReachedTimerStart(long value) {
+    public void setReachedTimerStart(long value)
+    {
         reachedTimerStart = value;
     }
 
-    public long getApproachTimerUPMillisSeconds() {
-        if (!approachTimerUPRunning) {
-            return 0;
-        }
 
-        return (System.currentTimeMillis() - approachTimerStartUP)/1000;
-    }
-
-    public void setApproachTimerUp(boolean set){
-        approachTimerUPRunning = set;
-    }
-
-    public long getApproachTimerDOWNMillisSeconds() {
-        if (!approachTimerDOWNRunning) {
-            return 0;
-        }
-
-        return (System.currentTimeMillis() - approachTimerStartDOWN) / 1000;
-    }
-
-    public void setApproachTimerDOWN(boolean set) {
-        approachTimerDOWNRunning = set;
-    }
-
-
-    public boolean getReachedSensorActive() {
-
+    public boolean getReachedSensorActive()
+    {
         return  levelInputs[1]  // Reached Sensor L1
                 || levelInputs[9]   // Reached Sensor L2
                 || levelInputs[17]  // Reached Sensor L3

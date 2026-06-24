@@ -370,14 +370,23 @@ public class ElevatorSAClass {
     private void performReset() throws Exception {
 
 
-       // modbus.stopMotor();
-        modbus.stopDoor();
         modbus.resetSimulation();
+        Thread.sleep(200);
+        modbus.resetSimulation();
+        Thread.sleep(200);
+        modbus.stopMotor();
+        Thread.sleep(200);
+        modbus.stopMotor();
+        Thread.sleep(200);
+        modbus.stopDoor();
+        Thread.sleep(200);
+        modbus.stopDoor();
+        Thread.sleep(200);
 
 
         stopDoorTimer();
-        centralLogic.setApproachTimerUp(false);
-        centralLogic.setApproachTimerDOWN(false);
+//        centralLogic.setApproachTimerUp(false);
+//        centralLogic.setApproachTimerDOWN(false);
         timerDoorLevel = 0;
 
 
@@ -389,10 +398,6 @@ public class ElevatorSAClass {
         centralLogic.setReq_Dir_Array(2, null);
         centralLogic.setReq_Dir_Array(3, null);
         centralLogic.setReq_Dir_Array(4, null);
-        centralLogic.setApproachTimerUp(false);
-        centralLogic.setApproachTimerStartUP(0);
-        centralLogic.setApproachTimerDOWN(false);
-        centralLogic.setApproachTimerStartDOWN(0);
         centralLogic.setReachedTimerRunning(false);
         centralLogic.setReachedTimerStart(0);
         centralLogic.setMode(CentralLogicClass.Mode.IDLE);
@@ -403,7 +408,8 @@ public class ElevatorSAClass {
         callLogic.setNextLevel(1);
         callLogic.setDirOfTrv(CentralLogicClass.Req_Dir.DontCare);
     }
-    //Conditions from STOPPED_OPEN_DOOR
+
+
     private boolean dc1() {
         // Close door when:
         // - call exists and 6 seconds waited and no ES
@@ -452,19 +458,7 @@ public class ElevatorSAClass {
                     return true;
                 }
         }
-
         return false;
-
-
-//        //one sec after approach sensor triggort (0,5m) left
-//        //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
-//        if (centralLogic.getApproachTimerUPMillisSeconds() >= 0.2 && modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel())
-//        {
-//            centralLogic.setApproachTimerUp(false);
-//            return true;
-//        }
-//        else
-//            return false;
     }
 
     private boolean U3()
@@ -476,25 +470,7 @@ public class ElevatorSAClass {
             timeDone = 0;
             return true;
         }
-
         return false;
-
-
-
-
-//        //look a dirofTrav
-//        //and level approach sensor == level form destination
-//        //and
-//        //saftey sensor - no matter which one -> physical space of elevator important
-//        if(callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up){
-//            if((modbus.getLastLowerApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySafetyStop())
-//                return true;
-//        }
-//        if(callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Down){
-//            if((modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel()) && centralLogic.getAnySafetyStop())
-//                return true;
-//        }
-//        return false;
     }
 
     //v2 down state transitions
@@ -508,7 +484,6 @@ public class ElevatorSAClass {
         {
             case 1:
                 if (System.currentTimeMillis() - inV2Timer + timeDone>= 3400) {
-                    System.out.println("80"+timeDone);
                     inV2Timer = 0;
                     timeDone = 0;
                     return true;
@@ -531,15 +506,6 @@ public class ElevatorSAClass {
         }
         return false;
 
-//        //one sec after approach sensor triggort (0,5m) left
-//        //and level approach sensor == level form destination (because differnt destinatioin could be set in that time)
-//        if (centralLogic.getApproachTimerDOWNMillisSeconds() >= 1 && modbus.getLastUpperApproachSensorLevel() == callLogic.getNextLevel())
-//        {
-//            centralLogic.setApproachTimerDOWN(false);
-//            return true;
-//        }
-//        else
-//            return false;
     }
 
     private boolean D3()
