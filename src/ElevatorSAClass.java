@@ -12,6 +12,11 @@ public class ElevatorSAClass {
     private long inV2Timer  = 0;
     private long inV1Timer  = 0;
     private long timeDone = 0;
+    private boolean go = false;
+    private boolean Crawl_before_Timer_running = false;
+    private boolean Crawl_after_Timer_running = false;
+    private long Crawl_before_Timer = 0;
+    private long Crawl_after_Timer = 0;
     private int levelWhereStartet = 1;
     private int nrOfLvlTrv = 0;
 
@@ -166,35 +171,110 @@ public class ElevatorSAClass {
 
             case CRAWL -> {
                 System.out.println("in crawl state");
+                // und oder nach zwanzig ssekunden wechseln
                 if(!centralLogic.getReachedSensorActive())
                 {
                     if(!wasReached)
                     {
-                        System.out.println("before");
+                        //hier timer nehmen
+                        if(!Crawl_before_Timer_running){
+                            Crawl_before_Timer = System.currentTimeMillis();
+                            Crawl_before_Timer_running = true;
+                            System.out.println("timer started");
+                        }
+
+                        if(System.currentTimeMillis() - Crawl_before_Timer >= 10000)
+                        {
+                            go = true;
+                            Crawl_before_Timer = 0;
+                            Crawl_before_Timer_running = false;
+                            System.out.println("timer 3 sec");
+                            // kann man auch lönger laufen lassen
+                        }
+
                         if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up)
+                        {
                             modbus.startCrawl(1);
+                            if (go)
+                            {
+                                modbus.startMotorUpV1();
+                                modbus.stopMotor();
+                                go = false;
+                            }
+                        }
+
                         else
+                        {
                             modbus.startCrawl(-1);
+                            if (go)
+                            {
+                                modbus.startMotorDownV1();
+                                modbus.stopMotor();
+                                go = false;
+                            }
+                        }
+
+
+                        System.out.println("before");
                     }
                     else
                     {
+                        //hier timer nehmen
+                        if(!Crawl_after_Timer_running){
+                            Crawl_after_Timer = System.currentTimeMillis();
+                            Crawl_after_Timer_running = true;
+                            System.out.println("timer started");
+                        }
+
+                        if(System.currentTimeMillis() - Crawl_after_Timer >= 10000)
+                        {
+                            go = true;
+                            Crawl_after_Timer = 0;
+                            Crawl_after_Timer_running = false;
+                            System.out.println("timer 3 sec");
+                            // kann man auch lönger laufen lassen
+                        }
+
+                        //hier timer nehmen
                         System.out.println("after");
                         if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up)
                         {
                             modbus.startCrawl(-1);
                             modbus.stopMotor();
+                            if (go)
+                            {
+                                modbus.startMotorDownV1();
+                                modbus.stopMotor();
+                                go = false;
+                            }
                         }
                         else
                         {
                             modbus.startCrawl(1);
                             modbus.stopMotor();
+                            if (go)
+                            {
+                                modbus.startMotorUpV1();
+                                modbus.stopMotor();
+                                go = false;
+                            }
                         }
                     }
                 }
                 else
                 {
                     System.out.println("reached sensor");
-                    wasReached = true;
+                    wasReached = !wasReached;       //change noted war true
+                    if(Crawl_before_Timer_running)
+                    {
+                        Crawl_before_Timer = 0;
+                        Crawl_before_Timer_running = false;
+                    }
+                    if(Crawl_after_Timer_running)
+                    {
+                        Crawl_after_Timer = 0;
+                        Crawl_after_Timer_running = false;
+                    }
                 }
 
                 //Transitions
