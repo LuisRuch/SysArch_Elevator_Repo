@@ -524,23 +524,38 @@ public class ElevatorSAClass {
         //if nr of level traveled = 1 -> true if inV2Timer = 2900ms
         nrOfLvlTrv = callLogic.getNextLevel()-levelWhereStartet;
 
+
+
         switch (nrOfLvlTrv) {
-            case 1:
-                jetzt = System.currentTimeMillis();
-                vergangeneZeit = (jetzt - letzteMessung)/1000;
-                 teilstrecke = centralLogic.getSpecialInputs()[2] * vergangeneZeit;
+
+
+
+            case 1: {
+                if (letzteMessung == 0) {
+                    letzteMessung = System.nanoTime();
+                    return false;
+                }
+                jetzt = System.nanoTime();
+                vergangeneZeit = (jetzt - letzteMessung)/1_000_000_000.0;
+                teilstrecke = centralLogic.getSpecialInputs()[2] * vergangeneZeit;
                 gesamtstrecke = gesamtstrecke + teilstrecke;
                 letzteMessung= jetzt;
 
-                if (gesamtstrecke >= 300) {
+                if (gesamtstrecke >= 200) {
+
+
                     System.out.println("strecke benutzt ..............");
                     teilstrecke = 0;
                     gesamtstrecke = 0;
                     vergangeneZeit = 0;
                     //letzteMessung = 0;
-                    jetzt = 0;
+                    //jetzt = 0;
                     return true;
                 }
+                break;
+            }
+
+
 
 //                if (System.currentTimeMillis() - inV2Timer + timeDone >= 2900) {
 //                    inV2Timer = 0;
@@ -548,21 +563,59 @@ public class ElevatorSAClass {
 //                    return true;
 //                }
 
-            case 2:
-                if (System.currentTimeMillis() - inV2Timer + timeDone>= 6400) {
-                    inV2Timer = 0;
-                    timeDone = 0;
-                    return true;
+            case 2: {
+
+                if (letzteMessung == 0) {
+                    letzteMessung = System.nanoTime();
+                    return false;
                 }
 
+                jetzt = System.nanoTime();
+                vergangeneZeit = (jetzt - letzteMessung)/1_000_000_000.0;
+                teilstrecke = centralLogic.getSpecialInputs()[2] * vergangeneZeit;
+                gesamtstrecke = gesamtstrecke + teilstrecke;
+                letzteMessung= jetzt;
 
-            case 3:
-                if (System.currentTimeMillis() - inV2Timer + timeDone >= 9900)
-                {
-                    inV2Timer = 0;
-                    timeDone = 0;
+                System.out.println("in case 2" + nrOfLvlTrv);
+                if (gesamtstrecke >= 550) {
+                    System.out.println("strecke benutzt ..............");
+                    teilstrecke = 0;
+                    gesamtstrecke = 0;
+                    vergangeneZeit = 0;
+                    letzteMessung = 0;
+                    jetzt = 0;
                     return true;
                 }
+                break;
+            }
+
+
+
+
+            case 3: {
+                if (letzteMessung == 0) {
+                    letzteMessung = System.nanoTime();
+                    return false;
+                }
+
+                jetzt = System.nanoTime();
+                vergangeneZeit = (jetzt - letzteMessung)/1_000_000_000.0;
+                teilstrecke = centralLogic.getSpecialInputs()[2] * vergangeneZeit;
+                gesamtstrecke = gesamtstrecke + teilstrecke;
+                letzteMessung= jetzt;
+
+                System.out.println("in case 2" + nrOfLvlTrv);
+                if (gesamtstrecke >= 900) {
+                    System.out.println("strecke benutzt ..............");
+                    teilstrecke = 0;
+                    gesamtstrecke = 0;
+                    vergangeneZeit = 0;
+                    letzteMessung = 0;
+                    jetzt = 0;
+                    return true;
+                }
+                break;
+            }
         }
         return false;
     }
@@ -588,27 +641,83 @@ public class ElevatorSAClass {
 
         switch (nrOfLvlTrv)
         {
-            case 1:
-                if (System.currentTimeMillis() - inV2Timer + timeDone>= 3400) {
-                    inV2Timer = 0;
-                    timeDone = 0;
+            case 1:{
+
+                if (letzteMessung == 0) {
+                    letzteMessung = System.nanoTime();
+                    return false;
+                }
+                jetzt = System.nanoTime();
+                vergangeneZeit = (jetzt - letzteMessung)/1_000_000_000.0;
+                teilstrecke = Math.abs(centralLogic.getSpecialInputs()[2]) * vergangeneZeit;
+                gesamtstrecke = gesamtstrecke + teilstrecke;
+                letzteMessung= jetzt;
+
+                if (gesamtstrecke >= 200) {
+
+
+                    System.out.println("strecke benutzt ..............");
+                    teilstrecke = 0;
+                    gesamtstrecke = 0;
+                    vergangeneZeit = 0;
+                    //letzteMessung = 0;
+                    //jetzt = 0;
                     return true;
                 }
+                break;
+            }
+
 
             case 2:
-                if (System.currentTimeMillis() - inV2Timer + timeDone >= 6900) {
-                    inV2Timer = 0;
-                    timeDone = 0;
+
+                if (letzteMessung == 0) {
+                    letzteMessung = System.nanoTime();
+                    return false;
+                }
+                jetzt = System.nanoTime();
+                vergangeneZeit = (jetzt - letzteMessung)/1_000_000_000.0;
+                teilstrecke = Math.abs(centralLogic.getSpecialInputs()[2]) * vergangeneZeit;
+                gesamtstrecke = gesamtstrecke + teilstrecke;
+                letzteMessung= jetzt;
+
+                if (gesamtstrecke >= 550) {
+
+
+                    System.out.println("strecke benutzt ..............");
+                    teilstrecke = 0;
+                    gesamtstrecke = 0;
+                    vergangeneZeit = 0;
+                    //letzteMessung = 0;
+                    //jetzt = 0;
                     return true;
                 }
+                break;
+
 
 
             case 3:
-                if (System.currentTimeMillis() - inV2Timer + timeDone>= 10400) {
-                    inV2Timer = 0;
-                    timeDone = 0;
+                if (letzteMessung == 0) {
+                    letzteMessung = System.nanoTime();
+                    return false;
+                }
+                jetzt = System.nanoTime();
+                vergangeneZeit = (jetzt - letzteMessung)/1_000_000_000.0;
+                teilstrecke = Math.abs(centralLogic.getSpecialInputs()[2]) * vergangeneZeit;
+                gesamtstrecke = gesamtstrecke + teilstrecke;
+                letzteMessung= jetzt;
+
+                if (gesamtstrecke >= 900) {
+
+
+                    System.out.println("strecke benutzt ..............");
+                    teilstrecke = 0;
+                    gesamtstrecke = 0;
+                    vergangeneZeit = 0;
+                    //letzteMessung = 0;
+                    //jetzt = 0;
                     return true;
                 }
+                break;
         }
         return false;
 
@@ -616,7 +725,7 @@ public class ElevatorSAClass {
 
     private boolean D3()
     {
-        if (System.currentTimeMillis() - inV1Timer + timeDone>= 3870)
+        if (System.currentTimeMillis() - inV1Timer >= 4800)
         {
             inV1Timer = 0;
             timeDone = 0;

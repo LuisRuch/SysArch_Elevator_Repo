@@ -99,6 +99,8 @@ public class CentralLogicClass {
                     setLevelInputs(modbus.getLevelInputs());
                     setStatusInputs(modbus.getStatusInputs());
                     setSpecialInputs(modbus.getSpecialInputs());
+                    //System.out.println("reached.................."+getLevelInputs()[17]);
+                    System.out.println("sensor.................."+lastSensorActive());
                     opcuaInput.handleInputs();
                     if(!opcuaInput.getSupervisor())
                     {
@@ -123,7 +125,22 @@ public class CentralLogicClass {
         pollingThread.start();
     }
 
+    public int lastSensorActive() {
+        class Memory {
+            private static int lastSensor = -1;
+        }
 
+        if (levelInputs != null) {
+            for (int i = levelInputs.length - 1; i >= 0; i--) {
+                if (levelInputs[i]) {
+                    Memory.lastSensor = i;
+                    break;
+                }
+            }
+        }
+
+        return Memory.lastSensor;
+    }
 
     //special Information
     public void calcfunctions()
