@@ -7,7 +7,8 @@ public class ElevatorSAClass {
 
     private State currentState = State.STOPPED;
     private State lastState = State.STOPPED;
-    private boolean wasReached = false;
+    private boolean flag1 = false;
+    private boolean flag2 = false;
 
     private double vergangeneZeit = 0;
     private double letzteMessung = 0;
@@ -174,22 +175,27 @@ public class ElevatorSAClass {
                 }
             }
 
-            case CRAWL -> {
+            case CRAWL ->
+            {
                 System.out.println("in crawl state");
                 // und oder nach zwanzig ssekunden wechseln
-                if(!centralLogic.getReachedSensorActive())
-                {
-                    if(!wasReached)
-                    {
-                        //hier timer nehmen
-                        if(!Crawl_before_Timer_running){
+
+                if(!centralLogic.getReachedSensorActive()) {
+
+                    if (flag1 && flag2) {
+                        centralLogic.setReachedHelper(false, callLogic.getNextLevel());
+                        System.out.println("reset flags");
+                    }
+
+                    if (!centralLogic.getReachedHelper()[callLogic.getNextLevel()]) {
+                        //erste phase
+                        if (!Crawl_before_Timer_running) {
                             Crawl_before_Timer = System.currentTimeMillis();
                             Crawl_before_Timer_running = true;
                             System.out.println("timer started");
                         }
 
-                        if(System.currentTimeMillis() - Crawl_before_Timer >= 10000)
-                        {
+                        if (System.currentTimeMillis() - Crawl_before_Timer >= 10000) {
                             go = true;
                             Crawl_before_Timer = 0;
                             Crawl_before_Timer_running = false;
@@ -197,42 +203,32 @@ public class ElevatorSAClass {
                             // kann man auch lönger laufen lassen
                         }
 
-                        if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up)
-                        {
+                        if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up) {
                             modbus.startCrawl(1);
-                            if (go)
-                            {
+                            if (go) {
                                 modbus.startMotorUpV1();
                                 modbus.stopMotor();
                                 go = false;
                             }
-                        }
-
-                        else
-                        {
+                        } else {
                             modbus.startCrawl(-1);
-                            if (go)
-                            {
+                            if (go) {
                                 modbus.startMotorDownV1();
                                 modbus.stopMotor();
                                 go = false;
                             }
                         }
-
-
                         System.out.println("before");
-                    }
-                    else
-                    {
+                    } else {
+                        flag1 = true;
                         //hier timer nehmen
-                        if(!Crawl_after_Timer_running){
+                        if (!Crawl_after_Timer_running) {
                             Crawl_after_Timer = System.currentTimeMillis();
                             Crawl_after_Timer_running = true;
                             System.out.println("timer started");
                         }
 
-                        if(System.currentTimeMillis() - Crawl_after_Timer >= 10000)
-                        {
+                        if (System.currentTimeMillis() - Crawl_after_Timer >= 10000) {
                             go = true;
                             Crawl_after_Timer = 0;
                             Crawl_after_Timer_running = false;
@@ -242,34 +238,35 @@ public class ElevatorSAClass {
 
                         //hier timer nehmen
                         System.out.println("after");
-                        if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up)
-                        {
+                        if (callLogic.getDirOfTrv() == CentralLogicClass.Req_Dir.Up) {
                             modbus.startCrawl(-1);
                             modbus.stopMotor();
-                            if (go)
-                            {
+                            if (go) {
                                 modbus.startMotorDownV1();
                                 modbus.stopMotor();
                                 go = false;
                             }
-                        }
-                        else
-                        {
+                        } else {
                             modbus.startCrawl(1);
                             modbus.stopMotor();
-                            if (go)
-                            {
+                            if (go) {
                                 modbus.startMotorUpV1();
                                 modbus.stopMotor();
                                 go = false;
                             }
                         }
                     }
+
                 }
+
                 else
                 {
+                    if(flag1)
+                        flag2 = true;
+
                     System.out.println("reached sensor");
-                    wasReached = !wasReached;       //change noted war true
+
+
                     if(Crawl_before_Timer_running)
                     {
                         Crawl_before_Timer = 0;
@@ -282,12 +279,15 @@ public class ElevatorSAClass {
                     }
                 }
 
+
                 //Transitions
                 if (ES()) {
                     changeState(State.STOPPED);
                 }
                 else if (finish()){
-                    wasReached = false;
+                    flag1 = false;
+                    flag2 = false;
+
                     callLogic.setCurrentLevel(callLogic.getNextLevel());
                     changeState(State.STOPPED);
                 }
@@ -347,6 +347,7 @@ public class ElevatorSAClass {
                 break;
 
             case V2_UP:
+                centralLogic.setReachedHelper(false, callLogic.getCurrentLevel());
                 inV2Timer = System.currentTimeMillis();
                 levelWhereStartet = callLogic.getCurrentLevel();
                 modbus.startMotorUpV2();
@@ -494,7 +495,6 @@ public class ElevatorSAClass {
         inV1Timer = 0;
         inV2Timer = 0;
         timeDone = 0;
-        wasReached = false;
         levelWhereStartet = 1;
         nrOfLvlTrv = 0;
     }
@@ -548,8 +548,8 @@ public class ElevatorSAClass {
                     teilstrecke = 0;
                     gesamtstrecke = 0;
                     vergangeneZeit = 0;
-                    //letzteMessung = 0;
-                    //jetzt = 0;
+                    letzteMessung = 0;
+                    jetzt = 0;
                     return true;
                 }
                 break;
@@ -623,10 +623,11 @@ public class ElevatorSAClass {
     private boolean U3()
     {
 
-        if (System.currentTimeMillis() - inV1Timer + timeDone>= 1500)
+        if (System.currentTimeMillis() - inV1Timer >= 1500)
         {
             inV1Timer = 0;
             timeDone = 0;
+            System.out.println("left v1");
             return true;
         }
         return false;
@@ -660,8 +661,8 @@ public class ElevatorSAClass {
                     teilstrecke = 0;
                     gesamtstrecke = 0;
                     vergangeneZeit = 0;
-                    //letzteMessung = 0;
-                    //jetzt = 0;
+                    letzteMessung = 0;
+                    jetzt = 0;
                     return true;
                 }
                 break;
@@ -687,8 +688,8 @@ public class ElevatorSAClass {
                     teilstrecke = 0;
                     gesamtstrecke = 0;
                     vergangeneZeit = 0;
-                    //letzteMessung = 0;
-                    //jetzt = 0;
+                    letzteMessung = 0;
+                    jetzt = 0;
                     return true;
                 }
                 break;
@@ -713,8 +714,8 @@ public class ElevatorSAClass {
                     teilstrecke = 0;
                     gesamtstrecke = 0;
                     vergangeneZeit = 0;
-                    //letzteMessung = 0;
-                    //jetzt = 0;
+                    letzteMessung = 0;
+                    jetzt = 0;
                     return true;
                 }
                 break;
@@ -801,6 +802,13 @@ public class ElevatorSAClass {
         return currentState;
     }
 
+    public int getNrOfLvlTrv() {
+        return nrOfLvlTrv;
+    }
+
+    public double getGesamtstrecke() {
+        return gesamtstrecke;
+    }
 }
 
 

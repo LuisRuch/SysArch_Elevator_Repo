@@ -52,11 +52,12 @@ public class CentralLogicClass {
     private Req_Dir[] Req_Dir_Array = new Req_Dir[6];
     public enum Mode {OnCall, IDLE}
     private Mode mode = Mode.IDLE;
-
+    public boolean wasInSupervisor = false;
 
     private boolean[] levelInputs;       // IX0.1 bis IX3.3
     private boolean[] statusInputs;      // IX10.0 bis IX10.4
     private long[] specialInputs;        // [0] cycles, [1] aufzugID, [2] speed
+    private boolean[] reachedHelper = new boolean[5];
 
 
     private boolean reachedTimerRunning = false;
@@ -99,6 +100,7 @@ public class CentralLogicClass {
                     setLevelInputs(modbus.getLevelInputs());
                     setStatusInputs(modbus.getStatusInputs());
                     setSpecialInputs(modbus.getSpecialInputs());
+                    reachsensorFunc();
                     //System.out.println("reached.................."+getLevelInputs()[17]);
                     System.out.println("sensor.................."+lastSensorActive());
                     opcuaInput.handleInputs();
@@ -142,9 +144,30 @@ public class CentralLogicClass {
         return Memory.lastSensor;
     }
 
+    public void reachsensorFunc()
+    {
+        if(elevatorSA.getCurrentState() == ElevatorSAClass.State.CRAWL)
+        {
+            if(getLevelInputs()[1])
+                reachedHelper[1] = true;
+
+            if(getLevelInputs()[9]){
+                reachedHelper[2] = true;
+            System.out.println("set true");}
+
+            if(getLevelInputs()[17])
+                reachedHelper[3] = true;
+
+            if(getLevelInputs()[25])
+                reachedHelper[4] = true;
+
+        }
+
+    }
     //special Information
     public void calcfunctions()
     {
+        switchBackFromSupervisor();
         if(!hasAnyStop())
         {
             mode = Mode.IDLE;
@@ -172,6 +195,28 @@ public class CentralLogicClass {
         return false;
     }
 
+    public void switchBackFromSupervisor()
+    {
+
+        if(opcuaInput.getSupervisor())
+            wasInSupervisor = true;
+
+        if(wasInSupervisor && opcuaInput.getSupervisor() == false)
+        {
+
+            if(levelInputs[1])
+                callLogic.setCurrentLevel(1);
+            if(levelInputs[9])
+                callLogic.setCurrentLevel(2);
+            if(levelInputs[17])
+                callLogic.setCurrentLevel(3);
+            if(levelInputs[25])
+                callLogic.setCurrentLevel(25);
+
+            wasInSupervisor = false;
+        }
+
+    }
 
 
     public boolean checkReachedTimer() {
@@ -283,5 +328,13 @@ public class CentralLogicClass {
 
     public void setSpecialInputs(long[] specialInputs) {
         this.specialInputs = specialInputs;
+    }
+
+    public void setReachedHelper(boolean reachedHelper, int level) {
+        this.reachedHelper[level] = reachedHelper;
+    }
+
+    public boolean[] getReachedHelper() {
+        return reachedHelper;
     }
 }

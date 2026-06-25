@@ -61,23 +61,41 @@ public class CallLogicClass
         int step = searchUp ? 1 : -1;
         int startLevel = currentLevel;
 
-        /*
-         * If a destination is already active, the elevator is normally moving
-         * or is committed to a trip. In that case, do not select the old
-         * currentLevel again. Otherwise a new call behind the elevator could
-         * replace the destination while travelling.
-         */
         if (difference != 0)
+        {
             startLevel += step;
 
-        for (int i = startLevel; searchUp ? i <= maxLevel : i >= minLevel; i += step)
+            ElevatorSAClass.State state = logic.elevatorSA.getCurrentState();
+
+            boolean searchingInCurrentV2Direction =
+                    (state == ElevatorSAClass.State.V2_UP && searchUp)
+                            || (state == ElevatorSAClass.State.V2_DOWN && !searchUp);
+
+            if (searchingInCurrentV2Direction)
+            {
+                int nrOfLvlTrv = logic.elevatorSA.getNrOfLvlTrv();
+                double gesamtstrecke = logic.elevatorSA.getGesamtstrecke();
+
+                if (nrOfLvlTrv > 1 && gesamtstrecke >= 200.0)
+                {
+                    int nichtMehrErreichbareLevel =
+                            1 + (int) ((gesamtstrecke - 200.0) / 350.0);
+
+                    nichtMehrErreichbareLevel =
+                            Math.min(nichtMehrErreichbareLevel, nrOfLvlTrv - 1);
+
+                    startLevel += nichtMehrErreichbareLevel * step;
+                }
+            }
+        }
+
+        for (int i = startLevel;
+             searchUp ? i <= maxLevel : i >= minLevel;
+             i += step)
         {
             if (!stops[i])
                 continue;
 
-            CentralLogicClass.Req_Dir requestedDirection = Req_Dir_Array[i];
-
-            // null and DontCare are cabin calls / calls without a direction.
             CentralLogicClass.Req_Dir upRequest = getUpRequest(i);
             CentralLogicClass.Req_Dir downRequest = getDownRequest(i);
 

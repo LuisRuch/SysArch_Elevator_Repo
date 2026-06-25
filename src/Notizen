@@ -1,39 +1,8 @@
 //BACKLOG
 --rember chang times back
 
-//Must
-sensor werden erreicht aber nicht in before after
 
 
 
 
 
-call dürffen während der fahrt nur weiter oben gesetzt werden
-
-
-
-
-
-Supervisory Mode switch to normal - drive to Position manually
-
-
-
-//Should
-move all Logic to CentralLogicClass  (ElevatorSA)
-
-
-
-//Can
-Do we need Stops[] and Req-Dir ??
-unnötige get set löschen
-Null prüfung
-sauber des mit dem exeptions machen
-
-
-
-
-
-//behavior
-wenn tür zu ist, dann fährt elevator direkt los. man kann nicht nochmal auf machen
-Der Motor wird immer kurz komplett gestopped wenn neues signal. mal schauen ob man das sieht
-call dürffen während der fahrt nur weiter oben gesetzt werden
