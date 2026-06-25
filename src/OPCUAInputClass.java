@@ -161,11 +161,7 @@ public class OPCUAInputClass {
     }
 
 
-    //Getter und Setter
-    public boolean getOpenDoor() {
-        return OpenDoor;
-    }
-
+    //Getter and Setter
     public boolean getCloseDoor() {
         return CloseDoor;
     }

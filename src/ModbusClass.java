@@ -55,28 +55,20 @@ public class ModbusClass {
     private static final int Input_AufzugID = 4;              // IW4
     private static final int Input_Speed = 6;                 // IW6
 
-    // gespeicherte Inputs
     private boolean[] levelInputs;       // IX0.1 bis IX3.3
     private boolean[] statusInputs;      // IX10.0 bis IX10.4
     private long[] specialInputs;        // [0] cycles, [1] aufzugID, [2] speed
 
-    private int lastLowerApproachSensorLevel = 0;
-    private int lastUpperApproachSensorLevel = 0;
 
-    // Modbus config
     public ModbusClass() throws UnknownHostException, IOException {
         client = new ModbusClient(HOST, PORT);
     }
+
 
     public void connect() throws Exception {
         client.Connect();
         System.out.println("Modbus verbunden mit " + HOST + ":" + PORT);
     }
-
-//    public void disconnect() throws Exception {
-//        client.Disconnect();
-//    }
-
 
     // Input methods
     public void readLevelInputs() throws Exception {
@@ -110,22 +102,6 @@ public class ModbusClass {
         readStatusInputs();
         readSpecialInputs();
     }
-
-
-    // Getter methods
-    public boolean[] getLevelInputs() {
-        return levelInputs;
-    }
-
-    public boolean[] getStatusInputs() {
-        return statusInputs;
-    }
-
-    public long[] getSpecialInputs() {
-        return specialInputs;
-    }
-
-
 
     // Output methods
     public void resetSimulation() throws Exception {
@@ -213,5 +189,18 @@ public class ModbusClass {
         client.WriteSingleRegister(Output_Crawl, 0);
         client.WriteSingleCoil(Output_Open_Door, false);
         client.WriteSingleCoil(Output_Close_Door, false);
+    }
+
+    //Getter methods
+    public boolean[] getLevelInputs() {
+        return levelInputs;
+    }
+
+    public boolean[] getStatusInputs() {
+        return statusInputs;
+    }
+
+    public long[] getSpecialInputs() {
+        return specialInputs;
     }
 }

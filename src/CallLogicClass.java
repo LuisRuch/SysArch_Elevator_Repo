@@ -1,8 +1,5 @@
 public class CallLogicClass
 {
-    // This class sets the nextLevel - therefore the elevator knows where to go.
-    // The information is used by the elevator state machine / motor logic.
-
     private CentralLogicClass.Req_Dir DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
     private int currentLevel = 1;
     private int nextLevel = 1;
@@ -14,24 +11,14 @@ public class CallLogicClass
     private final CentralLogicClass.Req_Dir[] Req_Dir_Array;
     CentralLogicClass logic;
 
-    public CallLogicClass(boolean[] stops,
-                          CentralLogicClass.Req_Dir[] Req_Dir_Array,
-                          CentralLogicClass logic)
+    public CallLogicClass(boolean[] stops, CentralLogicClass.Req_Dir[] Req_Dir_Array, CentralLogicClass logic)
     {
         this.stops = stops;
         this.Req_Dir_Array = Req_Dir_Array;
         this.logic = logic;
     }
 
-    /*
-     * searchUp:
-     * true  -> search from the current level to the top
-     * false -> search from the current level to the bottom
-     *
-     * sameDirection:
-     * true  -> cabin calls / DontCare / hall calls in travel direction
-     * false -> hall calls against the current travel direction
-     */
+
     private CentralLogicClass.Req_Dir getDownRequest(int level)
     {
         return switch (level)
@@ -54,8 +41,7 @@ public class CallLogicClass
         };
     }
 
-
-
+    //"body" to find the next level
     private boolean findNextLevel(boolean searchUp, boolean sameDirection)
     {
         int step = searchUp ? 1 : -1;
@@ -141,69 +127,6 @@ public class CallLogicClass
         DirOfTrv = CentralLogicClass.Req_Dir.DontCare;
     }
 
-//    private boolean hasStopAbove()
-//    {
-//        for (int i = currentLevel + 1; i <= maxLevel; i++)
-//        {
-//            if (stops[i])
-//                return true;
-//        }
-//        return false;
-//    }
-//
-//    private boolean hasStopBelow()
-//    {
-//        for (int i = currentLevel - 1; i >= minLevel; i--)
-//        {
-//            if (stops[i])
-//                return true;
-//        }
-//        return false;
-//    }
-//
-//    private int distanceToNextStopAbove()
-//    {
-//        for (int i = currentLevel + 1; i <= maxLevel; i++)
-//        {
-//            if (stops[i])
-//                return i - currentLevel;
-//        }
-//        return Integer.MAX_VALUE;
-//    }
-//
-//    private int distanceToNextStopBelow()
-//    {
-//        for (int i = currentLevel - 1; i >= minLevel; i--)
-//        {
-//            if (stops[i])
-//                return currentLevel - i;
-//        }
-//        return Integer.MAX_VALUE;
-//    }
-//
-//    private void chooseInitialDirection()
-//    {
-//        boolean stopAbove = hasStopAbove();
-//        boolean stopBelow = hasStopBelow();
-//
-//        if (stopAbove && !stopBelow)
-//        {
-//            DirOfTrv = CentralLogicClass.Req_Dir.Up;
-//        }
-//        else if (!stopAbove && stopBelow)
-//        {
-//            DirOfTrv = CentralLogicClass.Req_Dir.Down;
-//        }
-//        else if (stopAbove && stopBelow)
-//        {
-//            // If calls exist on both sides, take the closer side first.
-//            // In a tie, keep the old behaviour and prefer Up.
-//            if (distanceToNextStopAbove() <= distanceToNextStopBelow())
-//                DirOfTrv = CentralLogicClass.Req_Dir.Up;
-//            else
-//                DirOfTrv = CentralLogicClass.Req_Dir.Down;
-//        }
-//    }
 
     private void switchDirection()
     {
@@ -213,10 +136,12 @@ public class CallLogicClass
             DirOfTrv = CentralLogicClass.Req_Dir.Up;
     }
 
+
+    //"heart" - process to find fitting nextLevel
     public void UpdateNextLevel()
     {
-        //macht eigentlich keinen Sinn
-        //new next level
+
+
         if(logic.getReachedSensorActive())
         {
             if(logic.getLevelInputs()[1])
@@ -228,11 +153,8 @@ public class CallLogicClass
             else if(logic.getLevelInputs()[25])
                 nextLevel= 4;
         }
-        /*
-         * A request on the current floor may only be selected when no trip is
-         * currently active. During a trip, currentLevel is still the last
-         * reached floor and is therefore behind the elevator.
-         */
+
+
         if (difference == 0 && stops[currentLevel])
         {
             setFoundLevel(currentLevel);
@@ -241,14 +163,8 @@ public class CallLogicClass
 
         if (DirOfTrv == CentralLogicClass.Req_Dir.DontCare)
             DirOfTrv = CentralLogicClass.Req_Dir.Up;
-            //chooseInitialDirection();
 
-        // No calls above or below and no usable call on the current floor.
-//        if (DirOfTrv == CentralLogicClass.Req_Dir.DontCare)
-//        {
-//            clearDestination();
-//            return;
-//        }
+
 
         // 1. Search in the current travel direction for matching calls.
         if (DirOfTrv == CentralLogicClass.Req_Dir.Up)
@@ -304,14 +220,9 @@ public class CallLogicClass
         clearDestination();
     }
 
-    // Kept for compatibility with your ElevatorSAClass.
-    public int getdiffernce()
-    {
-        return difference;
-    }
 
-    // Correctly spelled additional getter.
-    public int getDifference()
+    //Setter and Getter
+    public int getdiffernce()
     {
         return difference;
     }

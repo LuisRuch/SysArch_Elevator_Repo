@@ -1,11 +1,6 @@
 public class CentralLogicClass {
 
     /*
-     * Array-Zuordnung der eingelesenen Inputs
-     *
-     * levelInputs = client.ReadDiscreteInputs(Input_l1sl, 27);
-     * Startadresse: IX0.1
-     *
      * levelInputs[0]  = IX0.1  = Input_l1sl
      * levelInputs[1]  = IX0.2  = Input_l1r
      * levelInputs[2]  = IX0.3  = Input_l1su
@@ -29,9 +24,6 @@ public class CentralLogicClass {
      * levelInputs[26] = IX3.3  = Input_l4su
      *
      *
-     * statusInputs = client.ReadDiscreteInputs(Input_Door_Opened, 5);
-     * Startadresse: IX10.0
-     *
      * statusInputs[0] = IX10.0 = Input_Door_Opened
      * statusInputs[1] = IX10.1 = Input_Door_Closed
      * statusInputs[2] = IX10.2 = Input_Motor_Ready
@@ -39,38 +31,38 @@ public class CentralLogicClass {
      * statusInputs[4] = IX10.4 = Input_Motor_Error
      *
      *
-     * specialInputs:
-     *
      * specialInputs[0] = Input_Cycles    // ID1
      * specialInputs[1] = Input_AufzugID  // IW4
      * specialInputs[2] = Input_Speed     // IW6
      */
 
-    //Variables for elevator levels - passed to HMI-Class
-    private boolean[] stops = new boolean[5];                        //stops[1] = level 1, stops[2] = level 2, stops[3] = level 3, stops[4] = level 4
-    public enum Req_Dir {Up, Down , DontCare};                      //Requested direction
-    private Req_Dir[] Req_Dir_Array = new Req_Dir[6];
+    //Datatypes
+    public enum Req_Dir {Up, Down , DontCare};
     public enum Mode {OnCall, IDLE}
+
+    //Modbus-Inputs
+    private boolean[] levelInputs;
+    private boolean[] statusInputs;
+    private long[] specialInputs;
+
+    //Variables for Calls
+    private boolean[] stops = new boolean[5];
+    private Req_Dir[] Req_Dir_Array = new Req_Dir[6];
+
+    //Other Variables
+    private boolean runningPolling = false;
     private Mode mode = Mode.IDLE;
     public boolean wasInSupervisor = false;
-
-    private boolean[] levelInputs;       // IX0.1 bis IX3.3
-    private boolean[] statusInputs;      // IX10.0 bis IX10.4
-    private long[] specialInputs;        // [0] cycles, [1] aufzugID, [2] speed
     private boolean[] reachedHelper = new boolean[5];
-
-
     private boolean reachedTimerRunning = false;
     private long reachedTimerStart = 0;
 
-    private boolean runningPolling = false;
 
     ModbusClass modbus;
-
     CallLogicClass callLogic;
     OPCUAInputClass opcuaInput;
     ElevatorSAClass elevatorSA;
-    //PollingClass polling;
+
 
     public CentralLogicClass(ModbusClass modbus)
     {
@@ -79,13 +71,11 @@ public class CentralLogicClass {
         callLogic = new CallLogicClass(stops,Req_Dir_Array,this);
         opcuaInput = new OPCUAInputClass(this,modbus);
         elevatorSA = new ElevatorSAClass(this,opcuaInput,modbus,callLogic);
-       // polling = new PollingClass(this,callLogic,opcuaInput,elevatorSA, modbus);
-
     }
 
     public void startPolling() throws Exception
     {
-        //pre
+        //Read all Inputs before starting the Polling
         modbus.readAllInputs();
         setLevelInputs(modbus.getLevelInputs());
         setStatusInputs(modbus.getStatusInputs());
@@ -101,12 +91,9 @@ public class CentralLogicClass {
                     setStatusInputs(modbus.getStatusInputs());
                     setSpecialInputs(modbus.getSpecialInputs());
                     reachsensorFunc();
-                    //System.out.println("reached.................."+getLevelInputs()[17]);
-                    System.out.println("sensor.................."+lastSensorActive());
                     opcuaInput.handleInputs();
                     if(!opcuaInput.getSupervisor())
                     {
-                        //if v1u/d or crawl or stopped aber kein reached -> skip updateNextLevel
                         if (elevatorSA.getCurrentState() != ElevatorSAClass.State.V1_UP
                                 && elevatorSA.getCurrentState() != ElevatorSAClass.State.V1_DOWN
                                 && elevatorSA.getCurrentState() != ElevatorSAClass.State.CRAWL
@@ -119,31 +106,33 @@ public class CentralLogicClass {
                     }
                     Thread.sleep(200);
                 } catch (Exception e) {
-                    System.err.println("Rsdfsadft reading error: " + e.getMessage());
+                    System.err.println("Error while Polling: " + e.getMessage());
                 }
             }
         });
-        //pollingModbusThread.setDaemon(true); // Thread stops if main stops
         pollingThread.start();
     }
 
-    public int lastSensorActive() {
-        class Memory {
-            private static int lastSensor = -1;
+
+
+    //Calling helping functions
+    public void calcfunctions()
+    {
+        switchBackFromSupervisor();
+        if(!hasAnyStop())
+        {
+            mode = Mode.IDLE;
         }
 
-        if (levelInputs != null) {
-            for (int i = levelInputs.length - 1; i >= 0; i--) {
-                if (levelInputs[i]) {
-                    Memory.lastSensor = i;
-                    break;
-                }
-            }
+        if(elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED &&  elevatorSA.getCurrentState() != ElevatorSAClass.State.OPENING_DOOR &&  elevatorSA.getCurrentState() != ElevatorSAClass.State.CLOSING_DOOR)
+        {
+            mode = Mode.OnCall;
         }
 
-        return Memory.lastSensor;
+        checkReachedTimer();
     }
 
+    //polled right after Modbus-Input -> so nothing gehts lost
     public void reachsensorFunc()
     {
         if(elevatorSA.getCurrentState() == ElevatorSAClass.State.CRAWL)
@@ -151,9 +140,8 @@ public class CentralLogicClass {
             if(getLevelInputs()[1])
                 reachedHelper[1] = true;
 
-            if(getLevelInputs()[9]){
+            if(getLevelInputs()[9])
                 reachedHelper[2] = true;
-            System.out.println("set true");}
 
             if(getLevelInputs()[17])
                 reachedHelper[3] = true;
@@ -164,28 +152,8 @@ public class CentralLogicClass {
         }
 
     }
-    //special Information
-    public void calcfunctions()
-    {
-        switchBackFromSupervisor();
-        if(!hasAnyStop())
-        {
-            mode = Mode.IDLE;
-        }
 
-        //only in second loop because calc is polled first, then transition is made
-        //if in second loop made no transition to other state (still in stopped - then no calls - idleor on call)
-        //wird erst im 2 durchlauf akuellisiert- wenn wirklich schon los ist. damit kann man sehen ob die request im gleiche floor ist und dann wird die tür geöffnet
-        if(elevatorSA.getCurrentState() != ElevatorSAClass.State.STOPPED &&  elevatorSA.getCurrentState() != ElevatorSAClass.State.OPENING_DOOR &&  elevatorSA.getCurrentState() != ElevatorSAClass.State.CLOSING_DOOR)
-        {
-            mode = Mode.OnCall;
-        }
-
-
-        checkReachedTimer();
-
-    }
-
+    //Other helper functions
     public boolean hasAnyStop() {
         for (boolean stop : stops) {
             if (stop) {
@@ -218,36 +186,30 @@ public class CentralLogicClass {
 
     }
 
-
     public boolean checkReachedTimer() {
 
-        // Timer starten, wenn Reached Sensor aktiv ist
         if (!reachedTimerRunning && getReachedSensorActive()) {
             reachedTimerRunning = true;
             reachedTimerStart = System.currentTimeMillis();
         }
 
-        // Wenn Timer nicht läuft, false zurückgeben
         if (!reachedTimerRunning) {
             return false;
         }
 
         long elapsedMillis = System.currentTimeMillis() - reachedTimerStart;
 
-        // Nach 2 Sekunden Timer stoppen
         if (elapsedMillis >= 2000) {
             reachedTimerRunning = false;
             return false;
         }
 
-        // Nach 1 Sekunde true zurückgeben
         return elapsedMillis >= 1000;
     }
 
 
 
-    //Getter und Setter
-
+    //Getter and Setter
     public void setReachedTimerRunning(boolean running)
     {
         reachedTimerRunning = running;
@@ -266,21 +228,6 @@ public class CentralLogicClass {
                 || levelInputs[17]  // Reached Sensor L3
                 ||  levelInputs[25]; // Reached Sensor L4
     }
-
-    public boolean getAnySafetyStop() {
-
-        return levelInputs[0]   // L1 SL
-                || levelInputs[2]   // L1 SU
-                || levelInputs[8]   // L2 SL
-                || levelInputs[10]  // L2 SU
-                || levelInputs[16]  // L3 SL
-                || levelInputs[18]  // L3 SU
-                || levelInputs[24]  // L4 SL
-                || levelInputs[26]; // L4 SU
-    }
-
-
-
 
     public boolean[] getStops() {
         return stops;
