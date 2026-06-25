@@ -197,6 +197,7 @@ public class CallLogicClass
 
     public void UpdateNextLevel()
     {
+        //macht eigentlich keinen Sinn
         //new next level
         if(logic.getReachedSensorActive())
         {
