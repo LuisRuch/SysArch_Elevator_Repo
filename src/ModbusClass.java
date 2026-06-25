@@ -8,7 +8,7 @@ public class ModbusClass {
     private ModbusClient client;
 
     private static final String HOST = "ea-pc111.ei.htwg-konstanz.de";
-    private static final int PORT = 508;
+    private static final int PORT = 510;
 
     // Output/Coil addresses: ("we write")
     private static final int Output_Simulation_Reset = 0;     // QX0.0

@@ -9,6 +9,11 @@ public class ElevatorSAClass {
     private State lastState = State.STOPPED;
     private boolean wasReached = false;
 
+    private double vergangeneZeit = 0;
+    private double letzteMessung = 0;
+    private double jetzt = 0;
+    private double gesamtstrecke;
+    private double teilstrecke;
     private long inV2Timer  = 0;
     private long inV1Timer  = 0;
     private long timeDone = 0;
@@ -521,11 +526,27 @@ public class ElevatorSAClass {
 
         switch (nrOfLvlTrv) {
             case 1:
-                if (System.currentTimeMillis() - inV2Timer + timeDone >= 2900) {
-                    inV2Timer = 0;
-                    timeDone = 0;
+                jetzt = System.currentTimeMillis();
+                vergangeneZeit = (jetzt - letzteMessung)/1000;
+                 teilstrecke = centralLogic.getSpecialInputs()[2] * vergangeneZeit;
+                gesamtstrecke = gesamtstrecke + teilstrecke;
+                letzteMessung= jetzt;
+
+                if (gesamtstrecke >= 300) {
+                    System.out.println("strecke benutzt ..............");
+                    teilstrecke = 0;
+                    gesamtstrecke = 0;
+                    vergangeneZeit = 0;
+                    //letzteMessung = 0;
+                    jetzt = 0;
                     return true;
                 }
+
+//                if (System.currentTimeMillis() - inV2Timer + timeDone >= 2900) {
+//                    inV2Timer = 0;
+//                    timeDone = 0;
+//                    return true;
+//                }
 
             case 2:
                 if (System.currentTimeMillis() - inV2Timer + timeDone>= 6400) {
